@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}🏷️ Tags{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🏷️ Tags</h1>
+        <a href="{{ path('app_tag_nouveau') }}" class="btn btn-primary">
+            ➕ Ajouter un tag
+        </a>
+    </div>
+
+    {% if tags is empty %}
+        <div class="alert alert-info text-center py-5">
+            <p class="mb-0">Aucun tag pour le moment. <a href="{{ path('app_tag_nouveau') }}">Créez le premier ! 🚀</a></p>
+        </div>
+    {% else %}
+        <div class="row g-3">
+            {% for tag in tags %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h5 class="card-title mb-2">{{ tag.nom }}</h5>
+                                <small class="text-muted">
+                                    📅 Utilisé dans {{ tag.evenements|length }} événement(s)
+                                </small>
+                            </div>
+                            <div class="ms-3">
+                                <div class="badge" style="background-color: {{ tag.couleur }}; color: white; padding: 20px;"></div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-top pt-3">
+                            <form method="post" action="{{ path('app_tag_supprimer', {id: tag.id}) }}"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce tag ?');"
+                                  class="d-inline w-100">
+                                <input type="hidden" name="_token" value="{{ csrf_token('supprimer_tag_' ~ tag.id) }}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                                    🗑️ Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

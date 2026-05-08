@@ -1,0 +1,169 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ evenement.titre }}{% endblock %}
+
+{% block body %}
+    <div class="row g-4">
+        {# Image et informations principales #}
+        <div class="col-lg-8">
+            {% if evenement.imageName %}
+                <img src="/uploads/evenements/{{ evenement.imageName }}" class="img-fluid rounded-3 mb-4 w-100" alt="{{ evenement.titre }}" style="max-height: 400px; object-fit: cover;">
+            {% else %}
+                <div class="bg-light rounded-3 d-flex align-items-center justify-content-center mb-4 w-100" style="height: 400px; font-size: 5rem;">
+                    📅
+                </div>
+            {% endif %}
+
+            <h1 class="display-5 mb-3">{{ evenement.titre }}</h1>
+
+            <div class="mb-4">
+                {% if evenement.categorie == 'conference' %}
+                    <span class="badge bg-info me-2">🎤 Conférence</span>
+                {% elseif evenement.categorie == 'atelier' %}
+                    <span class="badge bg-warning text-dark me-2">🔧 Atelier</span>
+                {% elseif evenement.categorie == 'meetup' %}
+                    <span class="badge bg-primary me-2">👥 Meetup</span>
+                {% elseif evenement.categorie == 'formation' %}
+                    <span class="badge bg-success me-2">📚 Formation</span>
+                {% elseif evenement.categorie == 'concert' %}
+                    <span class="badge bg-danger me-2">🎵 Concert</span>
+                {% endif %}
+
+                {% if evenement.statut == 'publie' %}
+                    <span class="badge bg-success">🟢 Publié</span>
+                {% elseif evenement.statut == 'brouillon' %}
+                    <span class="badge bg-secondary">📝 Brouillon</span>
+                {% elseif evenement.statut == 'complet' %}
+                    <span class="badge bg-danger">🔴 Complet</span>
+                {% elseif evenement.statut == 'annule' %}
+                    <span class="badge bg-dark">⚫ Annulé</span>
+                {% endif %}
+            </div>
+
+            <div class="mb-4 pb-4 border-bottom">
+                <p class="text-muted mb-3">
+                    <strong>📅 Date et heure :</strong><br>
+                    Du {{ evenement.dateDebut|date('d/m/Y à H:i') }} au {{ evenement.dateFin|date('d/m/Y à H:i') }}
+                </p>
+                <p class="text-muted mb-3">
+                    <strong>📍 Lieu :</strong><br>
+                    {{ evenement.lieu.nom }}<br>
+                    {{ evenement.lieu.adresse }}, {{ evenement.lieu.ville }}<br>
+                    <small class="text-secondary">Capacité du lieu : {{ evenement.lieu.capacite }} places</small>
+                </p>
+                {% if evenement.prix %}
+                    <p class="text-muted mb-0">
+                        <strong>💰 Tarif :</strong> {{ evenement.prix }} €
+                    </p>
+                {% else %}
+                    <p class="text-muted mb-0">
+                        <strong>💰 Tarif :</strong> <span class="badge bg-success">Gratuit</span>
+                    </p>
+                {% endif %}
+            </div>
+
+            <h3 class="mb-3">📄 Description</h3>
+            <p class="lead">{{ evenement.description }}</p>
+
+            {# Tags #}
+            {% if evenement.tags|length > 0 %}
+                <div class="mt-4">
+                    <h3 class="mb-3">🏷️ Tags associés</h3>
+                    <div>
+                        {% for tag in evenement.tags %}
+                            <span class="badge" style="background-color: {{ tag.couleur }}; color: white; padding: 6px 12px; margin-bottom: 8px;">
+                                {{ tag.nom }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        {# Sidebar - Jauge et inscription #}
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm" style="border-top: 4px solid #667eea !important;">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">👥 Inscription</h4>
+
+                    {% set places_occupees = evenement.inscriptions|length %}
+                    {% set places_restantes = evenement.capaciteMax - places_occupees %}
+                    {% set pourcentage = (places_occupees / evenement.capaciteMax * 100)|round %}
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>Places occupées</strong>
+                            <strong class="text-primary">{{ places_occupees }} / {{ evenement.capaciteMax }}</strong>
+                        </div>
+                        <div class="progress" style="height: 12px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ pourcentage }}%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);" aria-valuenow="{{ pourcentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    {% if places_restantes > 0 and evenement.statut != 'complet' and evenement.statut != 'annule' %}
+                        <div class="alert alert-success" role="alert">
+                            <strong>✅ {{ places_restantes }} place(s) disponible(s)</strong>
+                        </div>
+                        <a href="{{ path('app_evenement_inscription', {id: evenement.id}) }}" class="btn btn-success btn-lg w-100 mb-3">
+                            👉 S'inscrire maintenant
+                        </a>
+                    {% elseif evenement.statut == 'complet' %}
+                        <div class="alert alert-danger" role="alert">
+                            <strong>🔴 Événement COMPLET</strong>
+                        </div>
+                        <button class="btn btn-danger btn-lg w-100 mb-3" disabled>
+                            😞 Complet
+                        </button>
+                    {% elseif evenement.statut == 'annule' %}
+                        <div class="alert alert-dark" role="alert">
+                            <strong>⚫ Événement ANNULÉ</strong>
+                        </div>
+                        <button class="btn btn-dark btn-lg w-100 mb-3" disabled>
+                            😞 Annulé
+                        </button>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <a href="{{ path('app_evenements') }}" class="btn btn-outline-primary w-100">
+                            ← Retour à la liste
+                        </a>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_evenement_modifier', {id: evenement.id}) }}" class="btn btn-outline-warning">
+                            ✏️ Modifier
+                        </a>
+                        <form method="post" action="{{ path('app_evenement_supprimer', {id: evenement.id}) }}"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('supprimer_' ~ evenement.id) }}">
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                🗑️ Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {# Informations supplémentaires #}
+            <div class="card mt-3 border-0 shadow-sm" style="border-top: 4px solid #667eea !important;">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">📊 Statistiques</h5>
+                    <p class="mb-2">
+                        <strong>Inscriptions :</strong> {{ evenement.inscriptions|length }}
+                    </p>
+                    <p class="mb-2">
+                        <strong>Créé le :</strong> {{ evenement.dateCreation|date('d/m/Y H:i') }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>Organisateur :</strong> 
+                        {% if evenement.organisateur %}
+                            {{ evenement.organisateur.pseudo }}
+                        {% else %}
+                            <em>Non spécifié</em>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

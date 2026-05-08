@@ -63,6 +63,7 @@ class Evenement
 
     #[ORM\ManyToOne(inversedBy: 'evenements')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank]
     private ?Lieu $lieu = null;
 
     #[ORM\ManyToOne(inversedBy: 'evenementsOrganises')]

@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}📍 Lieux{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📍 Lieux</h1>
+        <a href="{{ path('app_lieu_nouveau') }}" class="btn btn-primary">
+            ➕ Ajouter un lieu
+        </a>
+    </div>
+
+    {% if lieux is empty %}
+        <div class="alert alert-info text-center py-5">
+            <p class="mb-0">Aucun lieu pour le moment. <a href="{{ path('app_lieu_nouveau') }}">Créez le premier ! 🚀</a></p>
+        </div>
+    {% else %}
+        <div class="row g-4">
+            {% for lieu in lieux %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0" style="border-top: 4px solid #667eea !important;">
+                        <div class="card-body">
+                            <h3 class="card-title h5 mb-3">📍 {{ lieu.nom }}</h3>
+                            <p class="card-text text-muted mb-2">
+                                <strong>Adresse :</strong><br>
+                                {{ lieu.adresse }}<br>
+                                {{ lieu.ville }}
+                            </p>
+                            <p class="card-text mb-0">
+                                <strong>👥 Capacité :</strong> {{ lieu.capacite }} places
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <span class="badge bg-secondary rounded-pill">
+                                📅 {{ lieu.evenements|length }} événement(s)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

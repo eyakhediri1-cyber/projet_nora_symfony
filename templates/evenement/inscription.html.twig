@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}📝 S'inscrire : {{ evenement.titre }}{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-4">📝 S'inscrire à l'événement</h1>
+
+            <div class="card mb-4 border-0 shadow-sm" style="border-top: 4px solid #667eea !important;">
+                <div class="card-body">
+                    <h3 class="card-title mb-2">{{ evenement.titre }}</h3>
+                    <p class="text-muted">
+                        📅 {{ evenement.dateDebut|date('d/m/Y à H:i') }} - {{ evenement.dateFin|date('H:i') }}<br>
+                        📍 {{ evenement.lieu.nom }}, {{ evenement.lieu.ville }}
+                    </p>
+                    {% if evenement.prix %}
+                        <p class="mb-0">
+                            <strong>💰 Tarif :</strong> {{ evenement.prix }} €
+                        </p>
+                    {% else %}
+                        <p class="mb-0">
+                            <strong>💰 Tarif :</strong> <span class="badge bg-success">Gratuit</span>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {{ form_start(formulaire) }}
+                <div class="mb-3">
+                    {{ form_row(formulaire.commentaire) }}
+                    <small class="form-text text-muted">Laissez un message pour l'organisateur (optionnel)</small>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    {{ form_row(formulaire.enregistrer) }}
+                    <a href="{{ path('app_evenement_detail', {id: evenement.id}) }}" class="btn btn-outline-secondary flex-grow-1">
+                        ← Annuler
+                    </a>
+                </div>
+
+            {{ form_end(formulaire) }}
+        </div>
+    </div>
+{% endblock %}

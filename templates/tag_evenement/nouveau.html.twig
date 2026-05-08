@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}➕ Ajouter un tag{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <h1 class="mb-4">➕ Ajouter un tag</h1>
+
+            {{ form_start(formulaire) }}
+                <div class="mb-3">
+                    {{ form_row(formulaire.nom) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_row(formulaire.couleur) }}
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    {{ form_row(formulaire.enregistrer) }}
+                    <a href="{{ path('app_tags') }}" class="btn btn-outline-secondary flex-grow-1">
+                        ← Annuler
+                    </a>
+                </div>
+
+            {{ form_end(formulaire) }}
+        </div>
+    </div>
+{% endblock %}

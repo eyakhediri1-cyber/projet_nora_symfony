@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}🎉 Accueil - Événements{% endblock %}
+
+{% block body %}
+    <div class="py-5">
+        <h1 class="display-4 mb-4">🎉 Bienvenue sur Les 2 Mousquetaires</h1>
+        <p class="lead text-muted mb-5">Découvrez et participez aux événements les plus intéressants de votre région.</p>
+
+        <div class="d-grid gap-2 d-sm-flex mb-5">
+            <a href="{{ path('app_evenements') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                📅 Voir tous les événements
+            </a>
+            <a href="{{ path('app_evenement_nouveau') }}" class="btn btn-outline-primary btn-lg px-4">
+                ➕ Créer un événement
+            </a>
+        </div>
+    </div>
+
+    {# Prochains événements #}
+    {% if evenements is not empty %}
+        <div class="my-5">
+            <h2 class="mb-4">📌 Prochains événements à venir</h2>
+
+            <div class="row g-4">
+                {% for evenement in evenements %}
+                    <div class="col-lg-6 col-xxl-4">
+                        <div class="card h-100 shadow-sm border-0" style="border-top-color: #667eea !important;">
+                            {% if evenement.imageName %}
+                                <img src="/uploads/evenements/{{ evenement.imageName }}" class="card-img-top" alt="{{ evenement.titre }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light card-img-top d-flex align-items-center justify-content-center" style="height: 200px; font-size: 3rem;">
+                                    📅
+                                </div>
+                            {% endif %}
+                            
+                            <div class="card-body">
+                                <h3 class="card-title h5 mb-2">{{ evenement.titre }}</h3>
+                                
+                                <div class="mb-3">
+                                    {% if evenement.categorie == 'conference' %}
+                                        <span class="badge bg-info">🎤 Conférence</span>
+                                    {% elseif evenement.categorie == 'atelier' %}
+                                        <span class="badge bg-warning text-dark">🔧 Atelier</span>
+                                    {% elseif evenement.categorie == 'meetup' %}
+                                        <span class="badge bg-primary">👥 Meetup</span>
+                                    {% elseif evenement.categorie == 'formation' %}
+                                        <span class="badge bg-success">📚 Formation</span>
+                                    {% elseif evenement.categorie == 'concert' %}
+                                        <span class="badge bg-danger">🎵 Concert</span>
+                                    {% endif %}
+
+                                    {% if evenement.statut == 'publie' %}
+                                        <span class="badge bg-success">🟢 Publié</span>
+                                    {% elseif evenement.statut == 'brouillon' %}
+                                        <span class="badge bg-secondary">📝 Brouillon</span>
+                                    {% elseif evenement.statut == 'complet' %}
+                                        <span class="badge bg-danger">🔴 Complet</span>
+                                    {% elseif evenement.statut == 'annule' %}
+                                        <span class="badge bg-dark">⚫ Annulé</span>
+                                    {% endif %}
+                                </div>
+
+                                <p class="text-muted small mb-2">
+                                    📅 {{ evenement.dateDebut|date('d/m/Y H:i') }} - {{ evenement.dateFin|date('H:i') }}
+                                </p>
+                                <p class="text-muted small mb-2">
+                                    📍 {{ evenement.lieu.nom }}, {{ evenement.lieu.ville }}
+                                </p>
+
+                                {% if evenement.prix %}
+                                    <p class="mb-2">
+                                        <strong>💰 {{ evenement.prix }} €</strong>
+                                    </p>
+                                {% endif %}
+
+                                {# Jauge de remplissage #}
+                                {% set places_occupees = evenement.inscriptions|length %}
+                                {% set pourcentage = (places_occupees / evenement.capaciteMax * 100)|round %}
+                                <div class="mb-3">
+                                    <small class="d-flex justify-content-between mb-1">
+                                        <span>Places : {{ places_occupees }} / {{ evenement.capaciteMax }}</span>
+                                        <span>{{ pourcentage }}%</span>
+                                    </small>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ pourcentage }}%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);" aria-valuenow="{{ pourcentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+
+                                {# Tags #}
+                                {% if evenement.tags|length > 0 %}
+                                    <div class="mb-3">
+                                        {% for tag in evenement.tags %}
+                                            <span class="badge" style="background-color: {{ tag.couleur }}; color: white;">
+                                                🏷️ {{ tag.nom }}
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="card-footer bg-transparent border-0">
+                                <a href="{{ path('app_evenement_detail', {id: evenement.id}) }}" class="btn btn-primary btn-sm w-100">
+                                    👁️ Voir les détails
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{{ path('app_evenements') }}" class="btn btn-lg btn-outline-primary">
+                    📅 Voir tous les événements →
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center py-5">
+            <p class="mb-0">Aucun événement pour le moment. <a href="{{ path('app_evenement_nouveau') }}">Créez le premier ! 🚀</a></p>
+        </div>
+    {% endif %}
+{% endblock %}

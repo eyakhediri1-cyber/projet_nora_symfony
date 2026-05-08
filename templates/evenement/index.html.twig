@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}📅 Événements{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📅 Tous les événements</h1>
+        <a href="{{ path('app_evenement_nouveau') }}" class="btn btn-primary">
+            ➕ Créer un événement
+        </a>
+    </div>
+
+    {% if evenements is empty %}
+        <div class="alert alert-info text-center py-5">
+            <p class="mb-0">Aucun événement pour le moment. <a href="{{ path('app_evenement_nouveau') }}">Créez le premier ! 🚀</a></p>
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>📝 Titre</th>
+                        <th>🎯 Catégorie</th>
+                        <th>📅 Date</th>
+                        <th>📍 Lieu</th>
+                        <th>👥 Places</th>
+                        <th>📊 Statut</th>
+                        <th class="text-center">⚙️ Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evenement in evenements %}
+                        <tr>
+                            <td>
+                                <strong>{{ evenement.titre }}</strong>
+                            </td>
+                            <td>
+                                {% if evenement.categorie == 'conference' %}
+                                    <span class="badge bg-info">🎤 Conférence</span>
+                                {% elseif evenement.categorie == 'atelier' %}
+                                    <span class="badge bg-warning text-dark">🔧 Atelier</span>
+                                {% elseif evenement.categorie == 'meetup' %}
+                                    <span class="badge bg-primary">👥 Meetup</span>
+                                {% elseif evenement.categorie == 'formation' %}
+                                    <span class="badge bg-success">📚 Formation</span>
+                                {% elseif evenement.categorie == 'concert' %}
+                                    <span class="badge bg-danger">🎵 Concert</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>{{ evenement.dateDebut|date('d/m/Y H:i') }}</small>
+                            </td>
+                            <td>
+                                <small>{{ evenement.lieu.nom }}<br><span class="text-muted">{{ evenement.lieu.ville }}</span></small>
+                            </td>
+                            <td>
+                                {% set places_occupees = evenement.inscriptions|length %}
+                                <small>
+                                    {{ places_occupees }} / {{ evenement.capaciteMax }}
+                                    {% set pourcentage = (places_occupees / evenement.capaciteMax * 100)|round %}
+                                    <div class="progress mt-1" style="height: 6px;">
+                                        <div class="progress-bar" style="width: {{ pourcentage }}%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);"></div>
+                                    </div>
+                                </small>
+                            </td>
+                            <td>
+                                {% if evenement.statut == 'publie' %}
+                                    <span class="badge bg-success">🟢 Publié</span>
+                                {% elseif evenement.statut == 'brouillon' %}
+                                    <span class="badge bg-secondary">📝 Brouillon</span>
+                                {% elseif evenement.statut == 'complet' %}
+                                    <span class="badge bg-danger">🔴 Complet</span>
+                                {% elseif evenement.statut == 'annule' %}
+                                    <span class="badge bg-dark">⚫ Annulé</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ path('app_evenement_detail', {id: evenement.id}) }}" class="btn btn-outline-primary" title="Voir les détails">
+                                        👁️
+                                    </a>
+                                    <a href="{{ path('app_evenement_modifier', {id: evenement.id}) }}" class="btn btn-outline-warning" title="Modifier">
+                                        ✏️
+                                    </a>
+                                    <form method="post" action="{{ path('app_evenement_supprimer', {id: evenement.id}) }}"
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');"
+                                          class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('supprimer_' ~ evenement.id) }}">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer">
+                                            🗑️
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}
