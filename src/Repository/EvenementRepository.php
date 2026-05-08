@@ -16,6 +16,24 @@ class EvenementRepository extends ServiceEntityRepository
         parent::__construct($registry, Evenement::class);
     }
 
+    /**
+     * Retourne les 6 prochains événements publiés
+     * @return Evenement[]
+     */
+    public function findUpcoming(int $limit = 6): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.statut = :statut')
+            ->andWhere('e.dateDebut >= :now')
+            ->setParameter('statut', 'publie')
+            ->setParameter('now', new \DateTime())
+            ->orderBy('e.dateDebut', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     //    /**
     //     * @return Evenement[] Returns an array of Evenement objects
     //     */

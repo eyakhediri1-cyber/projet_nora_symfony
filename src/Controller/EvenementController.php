@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Evenement;
+use App\Entity\Inscription;
 use App\Form\EvenementType;
+use App\Form\InscriptionType;
 use App\Repository\EvenementRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,71 +13,128 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/evenement')]
-final class EvenementController extends AbstractController
+class EvenementController extends AbstractController
 {
-    #[Route(name: 'app_evenement_index', methods: ['GET'])]
+    #[Route('/', name: 'app_accueil')]
+    public function accueil(EvenementRepository $evenementRepository): Response
+    {
+        // 6 prochains événements publiés
+        $evenements = $evenementRepository->findUpcoming(6);
+
+        return $this->render('evenement/accueil.html.twig', [
+            'evenements' => $evenements,
+        ]);
+    }
+
+    #[Route('/evenements', name: 'app_evenements')]
     public function index(EvenementRepository $evenementRepository): Response
     {
+        $evenements = $evenementRepository->findAll();
+
         return $this->render('evenement/index.html.twig', [
-            'evenements' => $evenementRepository->findAll(),
+            'evenements' => $evenements,
         ]);
     }
 
-    #[Route('/new', name: 'app_evenement_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/evenements/nouveau', name: 'app_evenement_nouveau')]
+    public function nouveau(Request $request, EntityManagerInterface $em): Response
     {
         $evenement = new Evenement();
+        
         $form = $this->createForm(EvenementType::class, $evenement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($evenement);
-            $entityManager->flush();
+            $em->persist($evenement);
+            $em->flush();
 
-            return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', '✅ Événement créé avec succès !');
+            return $this->redirectToRoute('app_evenements');
         }
 
-        return $this->render('evenement/new.html.twig', [
-            'evenement' => $evenement,
-            'form' => $form,
+        return $this->render('evenement/nouveau.html.twig', [
+            'formulaire' => $form,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_evenement_show', methods: ['GET'])]
-    public function show(Evenement $evenement): Response
+    #[Route('/evenements/{id}', name: 'app_evenement_detail', requirements: ['id' => '\d+'])]
+    public function detail(Evenement $evenement): Response
     {
-        return $this->render('evenement/show.html.twig', [
+        return $this->render('evenement/detail.html.twig', [
             'evenement' => $evenement,
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_evenement_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Evenement $evenement, EntityManagerInterface $entityManager): Response
+    #[Route('/evenements/{id}/modifier', name: 'app_evenement_modifier', requirements: ['id' => '\d+'])]
+    public function modifier(Evenement $evenement, Request $request, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(EvenementType::class, $evenement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $em->flush();
 
-            return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', '✏️ Événement modifié avec succès !');
+            return $this->redirectToRoute('app_evenement_detail', ['id' => $evenement->getId()]);
         }
 
-        return $this->render('evenement/edit.html.twig', [
+        return $this->render('evenement/modifier.html.twig', [
+            'formulaire' => $form,
             'evenement' => $evenement,
-            'form' => $form,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_evenement_delete', methods: ['POST'])]
-    public function delete(Request $request, Evenement $evenement, EntityManagerInterface $entityManager): Response
+    #[Route('/evenements/{id}/supprimer', name: 'app_evenement_supprimer', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function supprimer(Evenement $evenement, Request $request, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$evenement->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($evenement);
-            $entityManager->flush();
+        if ($this->isCsrfTokenValid('supprimer_' . $evenement->getId(), $request->request->get('_token'))) {
+            $em->remove($evenement);
+            $em->flush();
+
+            $this->addFlash('success', '🗑️ Événement supprimé avec succès.');
+        } else {
+            $this->addFlash('danger', '⚠️ Token CSRF invalide. Suppression annulée.');
         }
 
-        return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_evenements');
+    }
+
+    #[Route('/evenements/{id}/inscription', name: 'app_evenement_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function inscription(Evenement $evenement, Request $request, EntityManagerInterface $em, \App\Repository\UserRepository $userRepository): Response
+    {
+        // Simulation d'un utilisateur connecté si aucun n'existe
+        $user = $this->getUser();
+        if (!$user) {
+            $user = $userRepository->findOneBy([]);
+            // Si aucun utilisateur n'existe en BDD, on en crée un par défaut
+            if (!$user) {
+                $user = new \App\Entity\User();
+                $user->setEmail('invite@example.com');
+                $user->setPseudo('Invité');
+                $user->setPassword('password'); // À adapter selon vos besoins
+                $em->persist($user);
+            }
+        }
+
+        $inscription = new Inscription();
+        $inscription->setEvenement($evenement);
+        $inscription->setParticipant($user);
+        $inscription->setStatut('en_attente');
+        
+        $form = $this->createForm(InscriptionType::class, $inscription);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($inscription);
+            $em->flush();
+
+            $this->addFlash('success', '✅ Inscription confirmée !');
+            return $this->redirectToRoute('app_evenement_detail', ['id' => $evenement->getId()]);
+        }
+
+        return $this->render('evenement/inscription.html.twig', [
+            'formulaire' => $form,
+            'evenement' => $evenement,
+        ]);
     }
 }

@@ -11,71 +11,51 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/tag/evenement')]
-final class TagEvenementController extends AbstractController
+class TagEvenementController extends AbstractController
 {
-    #[Route(name: 'app_tag_evenement_index', methods: ['GET'])]
-    public function index(TagEvenementRepository $tagEvenementRepository): Response
+    #[Route('/tags', name: 'app_tags')]
+    public function index(TagEvenementRepository $tagRepository): Response
     {
+        $tags = $tagRepository->findAll();
+
         return $this->render('tag_evenement/index.html.twig', [
-            'tag_evenements' => $tagEvenementRepository->findAll(),
+            'tags' => $tags,
         ]);
     }
 
-    #[Route('/new', name: 'app_tag_evenement_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/tags/nouveau', name: 'app_tag_nouveau')]
+    public function nouveau(Request $request, EntityManagerInterface $em): Response
     {
-        $tagEvenement = new TagEvenement();
-        $form = $this->createForm(TagEvenementType::class, $tagEvenement);
+        $tag = new TagEvenement();
+        
+        $form = $this->createForm(TagEvenementType::class, $tag);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($tagEvenement);
-            $entityManager->flush();
+            $em->persist($tag);
+            $em->flush();
 
-            return $this->redirectToRoute('app_tag_evenement_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', '✅ Tag créé avec succès !');
+            return $this->redirectToRoute('app_tags');
         }
 
-        return $this->render('tag_evenement/new.html.twig', [
-            'tag_evenement' => $tagEvenement,
-            'form' => $form,
+        return $this->render('tag_evenement/nouveau.html.twig', [
+            'formulaire' => $form,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_tag_evenement_show', methods: ['GET'])]
-    public function show(TagEvenement $tagEvenement): Response
+    #[Route('/tags/{id}/supprimer', name: 'app_tag_supprimer', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function supprimer(TagEvenement $tag, Request $request, EntityManagerInterface $em): Response
     {
-        return $this->render('tag_evenement/show.html.twig', [
-            'tag_evenement' => $tagEvenement,
-        ]);
-    }
+        if ($this->isCsrfTokenValid('supprimer_tag_' . $tag->getId(), $request->request->get('_token'))) {
+            $em->remove($tag);
+            $em->flush();
 
-    #[Route('/{id}/edit', name: 'app_tag_evenement_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, TagEvenement $tagEvenement, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(TagEvenementType::class, $tagEvenement);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_tag_evenement_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', '🗑️ Tag supprimé avec succès.');
+        } else {
+            $this->addFlash('danger', '⚠️ Token CSRF invalide. Suppression annulée.');
         }
 
-        return $this->render('tag_evenement/edit.html.twig', [
-            'tag_evenement' => $tagEvenement,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_tag_evenement_delete', methods: ['POST'])]
-    public function delete(Request $request, TagEvenement $tagEvenement, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$tagEvenement->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($tagEvenement);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_tag_evenement_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_tags');
     }
 }

@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ evenement.titre }} - Les 2 Mousquetaires{% endblock %}
+
+{% block body %}
+    <section class="section-padding">
+        <div class="container">
+            <div class="row g-5">
+                {# Image et informations principales #}
+                <div class="col-lg-8">
+                    {% if evenement.imageName %}
+                        <img src="/uploads/evenements/{{ evenement.imageName }}" class="img-fluid rounded-4 shadow-sm mb-5 w-100" alt="{{ evenement.titre }}" style="max-height: 450px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light rounded-4 d-flex align-items-center justify-content-center mb-5 w-100" style="height: 450px; font-size: 5rem; background-color: #f8f9fa;">
+                            📅
+                        </div>
+                    {% endif %}
+
+                    <div class="section-title mb-4">
+                        <h2>{{ evenement.titre }}</h2>
+                    </div>
+
+                    <div class="mb-4 d-flex gap-2">
+                        {% if evenement.categorie == 'conference' %}
+                            <span class="badge bg-info">🎤 Conférence</span>
+                        {% elseif evenement.categorie == 'atelier' %}
+                            <span class="badge bg-warning text-dark">🔧 Atelier</span>
+                        {% elseif evenement.categorie == 'meetup' %}
+                            <span class="badge bg-primary">👥 Meetup</span>
+                        {% elseif evenement.categorie == 'formation' %}
+                            <span class="badge bg-success">📚 Formation</span>
+                        {% elseif evenement.categorie == 'concert' %}
+                            <span class="badge bg-danger">🎵 Concert</span>
+                        {% endif %}
+
+                        {% if evenement.statut == 'publie' %}
+                            <span class="badge bg-success">🟢 Publié</span>
+                        {% elseif evenement.statut == 'brouillon' %}
+                            <span class="badge bg-secondary">📝 Brouillon</span>
+                        {% elseif evenement.statut == 'complet' %}
+                            <span class="badge bg-danger">🔴 Complet</span>
+                        {% elseif evenement.statut == 'annule' %}
+                            <span class="badge bg-dark">⚫ Annulé</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="description_box mb-5 p-4 bg-white rounded-4 shadow-sm" style="border-left: 5px solid #525fe1;">
+                        <h3 class="h4 mb-3" style="color: #525fe1;">📄 Description</h3>
+                        <p class="lead" style="color: #4a5355;">{{ evenement.description }}</p>
+                    </div>
+
+                    {# Tags #}
+                    {% if evenement.tags|length > 0 %}
+                        <div class="mt-5">
+                            <h3 class="h4 mb-3">🏷️ Tags associés</h3>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for tag in evenement.tags %}
+                                    <span class="badge" style="background-color: {{ tag.couleur }}; color: white; padding: 8px 15px; border-radius: 50px;">
+                                        {{ tag.nom }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {# Sidebar - Jauge et inscription #}
+                <div class="col-lg-4">
+                    <div class="sidebar_content sticky-top" style="top: 120px;">
+                        <div class="card border-0 shadow-sm p-4 rounded-4 bg-white mb-4" style="border-top: 5px solid #525fe1 !important;">
+                            <h4 class="card-title mb-4" style="color: #0b104a; font-weight: 600;">👥 Inscription</h4>
+
+                            {% set places_occupees = evenement.inscriptions|length %}
+                            {% set places_restantes = evenement.capaciteMax - places_occupees %}
+                            {% set pourcentage = (places_occupees / evenement.capaciteMax * 100)|round %}
+
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Places occupées</span>
+                                    <strong style="color: #525fe1;">{{ places_occupees }} / {{ evenement.capaciteMax }}</strong>
+                                </div>
+                                <div class="progress" style="height: 10px; border-radius: 10px;">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ pourcentage }}%; background: #525fe1;" aria-valuenow="{{ pourcentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="text-end mt-1">
+                                    <small class="text-muted">{{ pourcentage }}% rempli</small>
+                                </div>
+                            </div>
+
+                            <div class="info_list mb-4">
+                                <p class="mb-3 d-flex align-items-center">
+                                    <i class="ti-calendar me-3" style="color: #525fe1; font-size: 1.2rem;"></i>
+                                    <span>
+                                        <strong>Date :</strong><br>
+                                        {{ evenement.dateDebut|date('d/m/Y H:i') }}
+                                    </span>
+                                </p>
+                                <p class="mb-3 d-flex align-items-center">
+                                    <i class="ti-location-pin me-3" style="color: #525fe1; font-size: 1.2rem;"></i>
+                                    <span>
+                                        <strong>Lieu :</strong><br>
+                                        {{ evenement.lieu.nom }}, {{ evenement.lieu.ville }}
+                                    </span>
+                                </p>
+                                <p class="mb-0 d-flex align-items-center">
+                                    <i class="ti-wallet me-3" style="color: #525fe1; font-size: 1.2rem;"></i>
+                                    <span>
+                                        <strong>Tarif :</strong><br>
+                                        {% if evenement.prix %}
+                                            <span style="font-size: 1.5rem; font-weight: 700; color: #0b104a;">{{ evenement.prix }} €</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Gratuit</span>
+                                        {% endif %}
+                                    </span>
+                                </p>
+                            </div>
+
+                            {% if evenement.statut == 'publie' and places_restantes > 0 %}
+                                <a href="{{ path('app_evenement_inscription', {id: evenement.id}) }}" class="btn_one w-100 text-center py-3">S'inscrire maintenant</a>
+                            {% elseif places_restantes <= 0 %}
+                                <button class="btn btn-secondary w-100 py-3" disabled>🔴 Événement complet</button>
+                            {% else %}
+                                <button class="btn btn-light w-100 py-3" disabled>Indisponible</button>
+                            {% endif %}
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a href="{{ path('app_evenements') }}" class="text-muted"><i class="ti-arrow-left me-2"></i>Retour à la liste</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

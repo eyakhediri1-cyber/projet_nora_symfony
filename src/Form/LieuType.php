@@ -4,6 +4,8 @@ namespace App\Form;
 
 use App\Entity\Lieu;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -12,10 +14,39 @@ class LieuType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom')
-            ->add('adresse')
-            ->add('ville')
-            ->add('capacite')
+            ->add('nom', TextType::class, [
+                'label' => '🏢 Nom du lieu',
+                'attr' => [
+                    'placeholder' => 'Ex: Salle de conférences A',
+                    'class' => 'form-control',
+                ],
+            ])
+            ->add('adresse', TextType::class, [
+                'label' => '📮 Adresse',
+                'attr' => [
+                    'placeholder' => '123 Rue de la Paix',
+                    'class' => 'form-control',
+                ],
+            ])
+            ->add('ville', TextType::class, [
+                'label' => '🏙️ Ville',
+                'attr' => [
+                    'placeholder' => 'Paris',
+                    'class' => 'form-control',
+                ],
+            ])
+            ->add('capacite', \Symfony\Component\Form\Extension\Core\Type\IntegerType::class, [
+                'label' => '👥 Capacité',
+                'attr' => [
+                    'min' => 1,
+                    'placeholder' => 'Nombre de places',
+                    'class' => 'form-control',
+                ],
+            ])
+            ->add('enregistrer', SubmitType::class, [
+                'label' => '💾 Enregistrer',
+                'attr' => ['class' => 'btn btn-primary w-100 mt-3'],
+            ])
         ;
     }
 

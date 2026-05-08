@@ -1,41 +1,52 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Lieu index{% endblock %}
+{% block title %}📍 Lieux - Les 2 Mousquetaires{% endblock %}
 
 {% block body %}
-    <h1>Lieu index</h1>
+    <section class="section-padding">
+        <div class="container">
+            <div class="section-title d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2>📍 Nos <b>lieux</b></h2>
+                    <p>Découvrez les endroits où se déroulent nos événements.</p>
+                </div>
+                <a href="{{ path('app_lieu_nouveau') }}" class="btn_one">
+                    ➕ Ajouter un lieu
+                </a>
+            </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Adresse</th>
-                <th>Ville</th>
-                <th>Capacite</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for lieu in lieus %}
-            <tr>
-                <td>{{ lieu.id }}</td>
-                <td>{{ lieu.nom }}</td>
-                <td>{{ lieu.adresse }}</td>
-                <td>{{ lieu.ville }}</td>
-                <td>{{ lieu.capacite }}</td>
-                <td>
-                    <a href="{{ path('app_lieu_show', {'id': lieu.id}) }}">show</a>
-                    <a href="{{ path('app_lieu_edit', {'id': lieu.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_lieu_new') }}">Create new</a>
+            {% if lieux is empty %}
+                <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
+                    <p class="lead mb-0">Aucun lieu pour le moment. <a href="{{ path('app_lieu_nouveau') }}" style="color: #525fe1;">Créez le premier ! 🚀</a></p>
+                </div>
+            {% else %}
+                <div class="row g-4">
+                    {% for lieu in lieux %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="single_tp p-4 rounded-4 shadow-sm bg-white h-100" style="border-top: 5px solid #525fe1 !important; transition: 0.3s;">
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="ti-location-pin sc_two me-3"></span>
+                                    <h3 class="mb-0">{{ lieu.nom }}</h3>
+                                </div>
+                                <div class="mb-4">
+                                    <p class="text-muted mb-2">
+                                        <i class="ti-map me-2"></i>{{ lieu.adresse }}<br>
+                                        <i class="ti-direction-alt me-2"></i>{{ lieu.ville }}
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong><i class="ti-user me-2"></i>Capacité :</strong> {{ lieu.capacite }} places
+                                    </p>
+                                </div>
+                                <div class="mt-auto">
+                                    <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                                        📅 {{ lieu.evenements|length }} événement(s)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
 {% endblock %}

@@ -1,37 +1,56 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}TagEvenement index{% endblock %}
+{% block title %}🏷️ Tags - Les 2 Mousquetaires{% endblock %}
 
 {% block body %}
-    <h1>TagEvenement index</h1>
+    <section class="section-padding">
+        <div class="container">
+            <div class="section-title d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2>🏷️ Nos <b>tags</b></h2>
+                    <p>Catégorisez vos événements pour une meilleure visibilité.</p>
+                </div>
+                <a href="{{ path('app_tag_nouveau') }}" class="btn_one">
+                    ➕ Ajouter un tag
+                </a>
+            </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Couleur</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for tag_evenement in tag_evenements %}
-            <tr>
-                <td>{{ tag_evenement.id }}</td>
-                <td>{{ tag_evenement.nom }}</td>
-                <td>{{ tag_evenement.couleur }}</td>
-                <td>
-                    <a href="{{ path('app_tag_evenement_show', {'id': tag_evenement.id}) }}">show</a>
-                    <a href="{{ path('app_tag_evenement_edit', {'id': tag_evenement.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_tag_evenement_new') }}">Create new</a>
+            {% if tags is empty %}
+                <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
+                    <p class="lead mb-0">Aucun tag pour le moment. <a href="{{ path('app_tag_nouveau') }}" style="color: #525fe1;">Créez le premier ! 🚀</a></p>
+                </div>
+            {% else %}
+                <div class="row g-4">
+                    {% for tag in tags %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="single_tp p-4 rounded-4 shadow-sm bg-white h-100" style="border-top: 5px solid {{ tag.couleur }} !important; transition: 0.3s;">
+                                <div class="d-flex align-items-center justify-content-between mb-4">
+                                    <div class="d-flex align-items-center">
+                                        <span class="ti-tag me-3" style="color: {{ tag.couleur }}; font-size: 1.5rem;"></span>
+                                        <h3 class="mb-0">{{ tag.nom }}</h3>
+                                    </div>
+                                    <div style="width: 20px; height: 20px; border-radius: 50%; background-color: {{ tag.couleur }}; box-shadow: 0 0 10px {{ tag.couleur }}80;"></div>
+                                </div>
+                                <div class="mb-4">
+                                    <p class="text-muted">
+                                        📅 Utilisé dans <strong>{{ tag.evenements|length }}</strong> événement(s)
+                                    </p>
+                                </div>
+                                <div class="mt-auto">
+                                    <form method="post" action="{{ path('app_tag_supprimer', {id: tag.id}) }}"
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce tag ?');"
+                                          class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('supprimer_tag_' ~ tag.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100" style="border-radius: 50px;">
+                                            🗑️ Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
 {% endblock %}

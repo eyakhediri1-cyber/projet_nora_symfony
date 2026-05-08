@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}📝 S'inscrire : {{ evenement.titre }} - Les 2 Mousquetaires{% endblock %}
+
+{% block body %}
+    <section class="section-padding">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="section-title text-center">
+                        <h2>📝 S'inscrire à l'<b>événement</b></h2>
+                        <p>Confirmez votre participation à cet événement exceptionnel.</p>
+                    </div>
+
+                    <div class="single_tp p-4 rounded-4 shadow-sm bg-white mb-5" style="border-top: 5px solid #525fe1 !important;">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="ti-calendar sc_two me-3" style="font-size: 2rem;"></span>
+                            <div>
+                                <h3 class="mb-1">{{ evenement.titre }}</h3>
+                                <p class="text-muted mb-0">
+                                    {{ evenement.dateDebut|date('d/m/Y à H:i') }} - {{ evenement.dateFin|date('H:i') }} | 
+                                    {{ evenement.lieu.nom }}, {{ evenement.lieu.ville }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            {% if evenement.prix %}
+                                <span class="h4" style="color: #0b104a; font-weight: 700;">💰 {{ evenement.prix }} €</span>
+                            {% else %}
+                                <span class="badge bg-success py-2 px-3">Gratuit</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="contact bg-white p-5 rounded-4 shadow-sm" style="border-top: 5px solid #525fe1 !important;">
+                        {{ form_start(formulaire) }}
+                            <div class="mb-4">
+                                {{ form_row(formulaire.commentaire, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Un message pour l\'organisateur ?'}}) }}
+                            </div>
+
+                            <div class="d-flex gap-3 mt-5">
+                                <div class="flex-grow-1">
+                                    {{ form_widget(formulaire.enregistrer, {'attr': {'class': 'btn_one w-100', 'style': 'border:none; height: 50px;'}}) }}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <a href="{{ path('app_evenement_detail', {id: evenement.id}) }}" class="header-btn w-100 text-center d-inline-block py-2" style="border: 2px solid #525fe1; border-radius: 50px; height: 50px; line-height: 30px;">
+                                        ← Annuler
+                                    </a>
+                                </div>
+                            </div>
+
+                        {{ form_end(formulaire) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

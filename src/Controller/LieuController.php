@@ -11,71 +11,36 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/lieu')]
-final class LieuController extends AbstractController
+class LieuController extends AbstractController
 {
-    #[Route(name: 'app_lieu_index', methods: ['GET'])]
+    #[Route('/lieux', name: 'app_lieux')]
     public function index(LieuRepository $lieuRepository): Response
     {
+        $lieux = $lieuRepository->findAll();
+
         return $this->render('lieu/index.html.twig', [
-            'lieus' => $lieuRepository->findAll(),
+            'lieux' => $lieux,
         ]);
     }
 
-    #[Route('/new', name: 'app_lieu_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/lieux/nouveau', name: 'app_lieu_nouveau')]
+    public function nouveau(Request $request, EntityManagerInterface $em): Response
     {
         $lieu = new Lieu();
+        
         $form = $this->createForm(LieuType::class, $lieu);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($lieu);
-            $entityManager->flush();
+            $em->persist($lieu);
+            $em->flush();
 
-            return $this->redirectToRoute('app_lieu_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', '✅ Lieu créé avec succès !');
+            return $this->redirectToRoute('app_lieux');
         }
 
-        return $this->render('lieu/new.html.twig', [
-            'lieu' => $lieu,
-            'form' => $form,
+        return $this->render('lieu/nouveau.html.twig', [
+            'formulaire' => $form,
         ]);
-    }
-
-    #[Route('/{id}', name: 'app_lieu_show', methods: ['GET'])]
-    public function show(Lieu $lieu): Response
-    {
-        return $this->render('lieu/show.html.twig', [
-            'lieu' => $lieu,
-        ]);
-    }
-
-    #[Route('/{id}/edit', name: 'app_lieu_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Lieu $lieu, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(LieuType::class, $lieu);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_lieu_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('lieu/edit.html.twig', [
-            'lieu' => $lieu,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_lieu_delete', methods: ['POST'])]
-    public function delete(Request $request, Lieu $lieu, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$lieu->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($lieu);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_lieu_index', [], Response::HTTP_SEE_OTHER);
     }
 }

@@ -1,53 +1,108 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Evenement index{% endblock %}
+{% block title %}📅 Événements - Les 2 Mousquetaires{% endblock %}
 
 {% block body %}
-    <h1>Evenement index</h1>
+    <section class="section-padding">
+        <div class="container">
+            <div class="section-title d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2>📅 Tous les <b>événements</b></h2>
+                    <p>Découvrez la liste complète de nos événements.</p>
+                </div>
+                <a href="{{ path('app_evenement_nouveau') }}" class="btn_one">
+                    ➕ Créer un événement
+                </a>
+            </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Titre</th>
-                <th>Description</th>
-                <th>DateDebut</th>
-                <th>DateFin</th>
-                <th>CapaciteMax</th>
-                <th>Prix</th>
-                <th>Categorie</th>
-                <th>Statut</th>
-                <th>DateCreation</th>
-                <th>ImageName</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for evenement in evenements %}
-            <tr>
-                <td>{{ evenement.id }}</td>
-                <td>{{ evenement.titre }}</td>
-                <td>{{ evenement.description }}</td>
-                <td>{{ evenement.dateDebut ? evenement.dateDebut|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ evenement.dateFin ? evenement.dateFin|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ evenement.capaciteMax }}</td>
-                <td>{{ evenement.prix }}</td>
-                <td>{{ evenement.categorie }}</td>
-                <td>{{ evenement.statut }}</td>
-                <td>{{ evenement.dateCreation ? evenement.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ evenement.imageName }}</td>
-                <td>
-                    <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}">show</a>
-                    <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="12">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_evenement_new') }}">Create new</a>
+            {% if evenements is empty %}
+                <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
+                    <p class="lead mb-0">Aucun événement pour le moment. <a href="{{ path('app_evenement_nouveau') }}" style="color: #525fe1;">Créez le premier ! 🚀</a></p>
+                </div>
+            {% else %}
+                <div class="table-responsive" style="background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #525fe1;">
+                                <th>📝 Titre</th>
+                                <th>🎯 Catégorie</th>
+                                <th>📅 Date</th>
+                                <th>📍 Lieu</th>
+                                <th>👥 Places</th>
+                                <th>📊 Statut</th>
+                                <th class="text-center">⚙️ Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for evenement in evenements %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ evenement.titre }}</strong>
+                                    </td>
+                                    <td>
+                                        {% if evenement.categorie == 'conference' %}
+                                            <span class="badge bg-info">🎤 Conférence</span>
+                                        {% elseif evenement.categorie == 'atelier' %}
+                                            <span class="badge bg-warning text-dark">🔧 Atelier</span>
+                                        {% elseif evenement.categorie == 'meetup' %}
+                                            <span class="badge bg-primary">👥 Meetup</span>
+                                        {% elseif evenement.categorie == 'formation' %}
+                                            <span class="badge bg-success">📚 Formation</span>
+                                        {% elseif evenement.categorie == 'concert' %}
+                                            <span class="badge bg-danger">🎵 Concert</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ evenement.dateDebut|date('d/m/Y H:i') }}</small>
+                                    </td>
+                                    <td>
+                                        <small>{{ evenement.lieu.nom }}<br><span class="text-muted">{{ evenement.lieu.ville }}</span></small>
+                                    </td>
+                                    <td>
+                                        {% set places_occupees = evenement.inscriptions|length %}
+                                        <small>
+                                            {{ places_occupees }} / {{ evenement.capaciteMax }}
+                                            {% set pourcentage = (places_occupees / evenement.capaciteMax * 100)|round %}
+                                            <div class="progress mt-1" style="height: 6px; border-radius: 10px;">
+                                                <div class="progress-bar" style="width: {{ pourcentage }}%; background: #525fe1;"></div>
+                                            </div>
+                                        </small>
+                                    </td>
+                                    <td>
+                                        {% if evenement.statut == 'publie' %}
+                                            <span class="badge bg-success">🟢 Publié</span>
+                                        {% elseif evenement.statut == 'brouillon' %}
+                                            <span class="badge bg-secondary">📝 Brouillon</span>
+                                        {% elseif evenement.statut == 'complet' %}
+                                            <span class="badge bg-danger">🔴 Complet</span>
+                                        {% elseif evenement.statut == 'annule' %}
+                                            <span class="badge bg-dark">⚫ Annulé</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a href="{{ path('app_evenement_detail', {id: evenement.id}) }}" class="btn btn-sm btn-outline-info" title="Voir les détails" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; line-height: 32px;">
+                                                👁️
+                                            </a>
+                                            <a href="{{ path('app_evenement_modifier', {id: evenement.id}) }}" class="btn btn-sm btn-outline-warning" title="Modifier" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; line-height: 32px;">
+                                                ✏️
+                                            </a>
+                                            <form method="post" action="{{ path('app_evenement_supprimer', {id: evenement.id}) }}"
+                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');"
+                                                  class="d-inline">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('supprimer_' ~ evenement.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; line-height: 32px;">
+                                                    🗑️
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </section>
 {% endblock %}
