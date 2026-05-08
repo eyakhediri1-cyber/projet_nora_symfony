@@ -81,11 +81,11 @@ class Evenement
     private Collection $inscriptions;
 
     public function __construct()
-    {
-        $this->dateCreation = new \DateTime(); // auto
-        $this->tags = new ArrayCollection();
-        $this->inscriptions = new ArrayCollection();
-    }
+{
+    $this->dateCreation = new \DateTime(); // auto
+    $this->tags = new ArrayCollection();
+    $this->inscriptions = new ArrayCollection();
+}
 
     public function getId(): ?int { return $this->id; }
 
