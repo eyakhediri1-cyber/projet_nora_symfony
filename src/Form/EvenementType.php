@@ -55,10 +55,9 @@ class EvenementType extends AbstractType
                 'placeholder' => '-- Choisir un lieu --',
                 'attr' => ['class' => 'form-control'],
             ])
-            ->add('capaciteMax', TextType::class, [
+            ->add('capaciteMax', \Symfony\Component\Form\Extension\Core\Type\IntegerType::class, [
                 'label' => '👥 Capacité maximale',
                 'attr' => [
-                    'type' => 'number',
                     'min' => 1,
                     'placeholder' => 'Nombre de places',
                     'class' => 'form-control',

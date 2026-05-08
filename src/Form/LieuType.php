@@ -35,10 +35,9 @@ class LieuType extends AbstractType
                     'class' => 'form-control',
                 ],
             ])
-            ->add('capacite', TextType::class, [
+            ->add('capacite', \Symfony\Component\Form\Extension\Core\Type\IntegerType::class, [
                 'label' => '👥 Capacité',
                 'attr' => [
-                    'type' => 'number',
                     'min' => 1,
                     'placeholder' => 'Nombre de places',
                     'class' => 'form-control',

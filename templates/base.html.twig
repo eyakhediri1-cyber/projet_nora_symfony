@@ -2,59 +2,34 @@
 <html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>{% block title %}🎉 Les 2 Mousquetaires - Événements{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🎉</text></svg>">
         
-        <!-- Bootstrap 5 CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        
-        <!-- CSS personnalisés -->
-        <link rel="stylesheet" href="{{ asset('css/custom-overrides.css') }}">
-        
+        <!-- Latest Bootstrap min CSS -->
+        <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">		
+        <!-- Google Font -->
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <!-- Font Awesome CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+        <link rel="stylesheet" href="{{ asset('assets/fonts/font-awesome.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('assets/fonts/themify-icons.css') }}">
+        <!--- owl carousel Css-->
+        <link rel="stylesheet" href="{{ asset('assets/owlcarousel/css/owl.carousel.css') }}">
+        <link rel="stylesheet" href="{{ asset('assets/owlcarousel/css/owl.theme.css') }}">	
+        <!--jquery-simple-mobilemenu Css-->
+        <link rel="stylesheet" href="{{ asset('assets/css/jquery-simple-mobilemenu.css') }}">			
+        <!-- MAGNIFIC CSS -->
+        <link rel="stylesheet" href="{{ asset('assets/css/magnific-popup.css') }}">		
+        <!-- animate CSS -->
+        <link rel="stylesheet" href="{{ asset('assets/css/animate.css') }}">	
+        <!-- Style CSS -->					
+        <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+
         {% block stylesheets %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
-
-        <style>
-            body {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-            }
-            main {
-                flex: 1;
-                padding: 30px 0;
-            }
-            .navbar {
-                background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            }
-            .navbar-brand {
-                font-weight: bold;
-                font-size: 1.5rem;
-            }
-            body > .container {
-                background: white;
-                border-radius: 8px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            }
-            .card {
-                border: none;
-                border-top: 4px solid #667eea;
-                transition: transform 0.2s, box-shadow 0.2s;
-            }
-            .card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            }
-            footer {
-                background: rgba(255,255,255,0.1);
-                color: white;
-                margin-top: auto;
-            }
-        </style>
 
         {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
         {% if frankenphpHotReload %}
@@ -63,29 +38,54 @@
         <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
         {% endif %}
     </head>
-    <body>
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-dark">
-            <div class="container">
-                <a class="navbar-brand" href="{{ path('app_accueil') }}">🎉 Événements</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <div class="navbar-nav ms-auto">
-                        <a class="nav-link active" aria-current="page" href="{{ path('app_accueil') }}">🏠 Accueil</a>
-                        <a class="nav-link" href="{{ path('app_evenements') }}">📅 Événements</a>
-                        <a class="nav-link" href="{{ path('app_lieux') }}">📍 Lieux</a>
-                        <a class="nav-link" href="{{ path('app_tags') }}">🏷️ Tags</a>
-                    </div>
-                </div>
-            </div>
-        </nav>
+    <body data-spy="scroll" data-offset="80">
+        <!-- START PRELOADER -->
+        <div class="preloaders">
+            <span class="loader"></span>
+        </div>
+        <!-- END PRELOADER -->
+
+        <!-- START NAVBAR -->  
+        <div id="navigation" class="navbar-light bg-faded site-navigation">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-20 align-self-center">
+                        <div class="site-logo">
+                            <a href="{{ path('app_accueil') }}"><img src="{{ asset('assets/img/logo.png') }}" alt="Logo"></a>          				
+                        </div>
+                    </div><!--- END Col -->
+                    
+                    <div class="col-60 d-flex">
+                        <nav id="main-menu">
+                            <ul>
+                                <li><a href="{{ path('app_accueil') }}" class="{{ app.request.get('_route') == 'app_accueil' ? 'active' : '' }}">🏠 Accueil</a></li>
+                                <li><a href="{{ path('app_evenements') }}" class="{{ app.request.get('_route') starts with 'app_evenement' ? 'active' : '' }}">📅 Événements</a></li>
+                                <li><a href="{{ path('app_lieux') }}" class="{{ app.request.get('_route') starts with 'app_lieu' ? 'active' : '' }}">📍 Lieux</a></li>
+                                <li><a href="{{ path('app_tags') }}" class="{{ app.request.get('_route') starts with 'app_tag' ? 'active' : '' }}">🏷️ Tags</a></li>
+                            </ul>
+                        </nav>
+                    </div><!--- END Col -->
+                    
+                    <div class="col-20 d-none d-xl-block text-end align-self-center">
+                        <a href="#" class="header-btn">Connexion</a>
+                        <a href="#" class="btn_one">S'inscrire</a>
+                    </div><!--- END Col -->
+                    
+                    <ul class="mobile_menu">						
+                        <li><a href="{{ path('app_accueil') }}">🏠 Accueil</a></li>
+                        <li><a href="{{ path('app_evenements') }}">📅 Événements</a></li>
+                        <li><a href="{{ path('app_lieux') }}">📍 Lieux</a></li>
+                        <li><a href="{{ path('app_tags') }}">🏷️ Tags</a></li>
+                    </ul>			
+                </div><!--- END ROW -->
+            </div><!--- END CONTAINER -->
+        </div> 	  
+        <!-- END NAVBAR -->
 
         <!-- Main Content -->
-        <main>
+        <main style="padding-top: 100px; min-height: 70vh;">
             <div class="container">
-                {# Messages flash avec Bootstrap Alerts #}
+                {# Messages flash #}
                 {% for label, messages in app.flashes %}
                     {% set alertType = label == 'success' ? 'success' : (label == 'danger' ? 'danger' : 'warning') %}
                     {% for message in messages %}
@@ -100,19 +100,63 @@
             </div>
         </main>
 
-        <!-- Footer -->
-        <footer class="py-4 text-center mt-5">
+        <!-- START FOOTER -->
+        <footer class="footer_area" style="background-color: #1a1a1a; color: white; padding: 50px 0;">
             <div class="container">
-                <p class="mb-1">&copy; {{ "now"|date("Y") }} — Les 2 Mousquetaires 🗡️</p>
-                <small>Gestion d'événements avec Symfony 7.4</small>
+                <div class="row">
+                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                        <div class="single_footer">
+                            <a href="{{ path('app_accueil') }}"><img src="{{ asset('assets/img/logo.png') }}" alt="Logo"></a>
+                            <p>Les 2 Mousquetaires - Votre plateforme de gestion d'événements préférée.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                        <div class="single_footer">
+                            <h4>Liens rapides</h4>
+                            <ul>
+                                <li><a href="{{ path('app_accueil') }}">Accueil</a></li>
+                                <li><a href="{{ path('app_evenements') }}">Événements</a></li>
+                                <li><a href="{{ path('app_lieux') }}">Lieux</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                        <div class="single_footer">
+                            <h4>Contact</h4>
+                            <p>Email: contact@2mousquetaires.com</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </footer>
+        <!-- END FOOTER COPYRIGHT -->
+        <div class="foot_copy" style="background-color: #111; padding: 20px 0; text-align: center; color: #888;">
+            <p>&copy; {{ "now"|date("Y") }} Les 2 Mousquetaires. Tous droits réservés.</p>
+        </div>
 
-        <!-- Bootstrap 5 JS Bundle -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Theme JS -->
-        <script src="{{ asset('js/theme.js') }}"></script>
+        <!-- Latest jQuery -->
+        <script src="{{ asset('assets/js/jquery-1.12.4.min.js') }}"></script>
+        <!-- Latest compiled and minified Bootstrap -->
+        <script src="{{ asset('assets/bootstrap/js/bootstrap.min.js') }}"></script>
+        <!-- modernizer JS -->
+        <script src="{{ asset('assets/js/modernizr-2.8.3.min.js') }}"></script>
+        <!-- jquery-simple-mobilemenu.min -->
+        <script src="{{ asset('assets/js/jquery-simple-mobilemenu.js') }}"></script>
+        <!-- owl-carousel min js  -->
+        <script src="{{ asset('assets/owlcarousel/js/owl.carousel.min.js') }}"></script>
+        <!-- magnific-popup js -->               
+        <script src="{{ asset('assets/js/jquery.magnific-popup.min.js') }}"></script>
+        <!-- countTo js -->
+        <script src="{{ asset('assets/js/jquery.inview.min.js') }}"></script>
+        <!-- scrolltopcontrol js -->
+        <script src="{{ asset('assets/js/scrolltopcontrol.js') }}"></script>
+        <!-- WOW - Reveal Animations When You Scroll -->
+        <script src="{{ asset('assets/js/wow.min.js') }}"></script>
+        <!-- scripts js -->
+        <script src="{{ asset('assets/js/scripts.js') }}"></script>
+        
         {% block javascripts %}
         {% endblock %}
     </body>
 </html>
+

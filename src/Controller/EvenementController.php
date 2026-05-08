@@ -100,10 +100,26 @@ class EvenementController extends AbstractController
     }
 
     #[Route('/evenements/{id}/inscription', name: 'app_evenement_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function inscription(Evenement $evenement, Request $request, EntityManagerInterface $em): Response
+    public function inscription(Evenement $evenement, Request $request, EntityManagerInterface $em, \App\Repository\UserRepository $userRepository): Response
     {
+        // Simulation d'un utilisateur connecté si aucun n'existe
+        $user = $this->getUser();
+        if (!$user) {
+            $user = $userRepository->findOneBy([]);
+            // Si aucun utilisateur n'existe en BDD, on en crée un par défaut
+            if (!$user) {
+                $user = new \App\Entity\User();
+                $user->setEmail('invite@example.com');
+                $user->setPseudo('Invité');
+                $user->setPassword('password'); // À adapter selon vos besoins
+                $em->persist($user);
+            }
+        }
+
         $inscription = new Inscription();
         $inscription->setEvenement($evenement);
+        $inscription->setParticipant($user);
+        $inscription->setStatut('en_attente');
         
         $form = $this->createForm(InscriptionType::class, $inscription);
         $form->handleRequest($request);

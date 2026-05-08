@@ -1,28 +1,41 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}➕ Ajouter un tag{% endblock %}
+{% block title %}➕ Ajouter un tag - Les 2 Mousquetaires{% endblock %}
 
 {% block body %}
-    <div class="row justify-content-center">
-        <div class="col-lg-6">
-            <h1 class="mb-4">➕ Ajouter un tag</h1>
+    <section class="section-padding">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="section-title text-center">
+                        <h2>➕ Ajouter un <b>tag</b></h2>
+                        <p>Créez une nouvelle étiquette pour organiser vos événements.</p>
+                    </div>
 
-            {{ form_start(formulaire) }}
-                <div class="mb-3">
-                    {{ form_row(formulaire.nom) }}
-                </div>
-                <div class="mb-3">
-                    {{ form_row(formulaire.couleur) }}
-                </div>
+                    <div class="contact bg-white p-5 rounded-4 shadow-sm" style="border-top: 5px solid #525fe1 !important;">
+                        {{ form_start(formulaire) }}
+                            <div class="mb-4">
+                                {{ form_row(formulaire.nom, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                            <div class="mb-4">
+                                {{ form_row(formulaire.couleur, {'attr': {'class': 'form-control form-control-color w-100', 'style': 'height: 50px;'}}) }}
+                            </div>
 
-                <div class="d-flex gap-2 mt-4">
-                    {{ form_row(formulaire.enregistrer) }}
-                    <a href="{{ path('app_tags') }}" class="btn btn-outline-secondary flex-grow-1">
-                        ← Annuler
-                    </a>
-                </div>
+                            <div class="d-flex gap-3 mt-5">
+                                <div class="flex-grow-1">
+                                    {{ form_widget(formulaire.enregistrer, {'attr': {'class': 'btn_one w-100', 'style': 'border:none; height: 50px;'}}) }}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <a href="{{ path('app_tags') }}" class="header-btn w-100 text-center d-inline-block py-2" style="border: 2px solid #525fe1; border-radius: 50px; height: 50px; line-height: 30px;">
+                                        ← Annuler
+                                    </a>
+                                </div>
+                            </div>
 
-            {{ form_end(formulaire) }}
+                        {{ form_end(formulaire) }}
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 {% endblock %}
