@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TagEvenement index{% endblock %}
+
+{% block body %}
+    <h1>TagEvenement index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Couleur</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for tag_evenement in tag_evenements %}
+            <tr>
+                <td>{{ tag_evenement.id }}</td>
+                <td>{{ tag_evenement.nom }}</td>
+                <td>{{ tag_evenement.couleur }}</td>
+                <td>
+                    <a href="{{ path('app_tag_evenement_show', {'id': tag_evenement.id}) }}">show</a>
+                    <a href="{{ path('app_tag_evenement_edit', {'id': tag_evenement.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_tag_evenement_new') }}">Create new</a>
+{% endblock %}
