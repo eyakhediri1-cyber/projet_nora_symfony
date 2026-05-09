@@ -65,7 +65,7 @@ class EvenementType extends AbstractType
             ])
             ->add('prix', MoneyType::class, [
                 'label' => '💰 Prix',
-                'currency' => 'EUR',
+                'currency' => 'TND',
                 'divisor' => 1,
                 'required' => false,
                 'attr' => [

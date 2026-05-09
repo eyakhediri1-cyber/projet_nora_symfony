@@ -1,6 +1,8 @@
 <?php
 namespace App\Controller;
 
+
+use App\Service\FileUploader;
 use App\Entity\Evenement;
 use App\Entity\Inscription;
 use App\Form\EvenementType;
@@ -14,6 +16,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\MailerInterface;
 
 class EvenementController extends AbstractController
 {
@@ -46,24 +51,30 @@ class EvenementController extends AbstractController
     }
 
     #[Route('/evenements/nouveau', name: 'app_evenement_nouveau')]
-    #[IsGranted('ROLE_ORGANISATEUR')]
-    public function nouveau(Request $request, EntityManagerInterface $em): Response
-    {
-        $evenement = new Evenement();
-        $form = $this->createForm(EvenementType::class, $evenement);
-        $form->handleRequest($request);
+#[IsGranted('ROLE_ORGANISATEUR')]
+public function nouveau(Request $request, EntityManagerInterface $em, FileUploader $uploader): Response
+{
+    $evenement = new Evenement();
+    $form = $this->createForm(EvenementType::class, $evenement);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $evenement->setOrganisateur($this->getUser());
-            $evenement->setDateCreation(new \DateTime());
-            $em->persist($evenement);
-            $em->flush();
-            $this->addFlash('success', '✅ Événement créé !');
-            return $this->redirectToRoute('app_evenements');
+    if ($form->isSubmitted() && $form->isValid()) {
+        $imageFile = $form->get('imageName')->getData();
+        if ($imageFile) {
+            $evenement->setImageName($uploader->upload($imageFile));
         }
-
-        return $this->render('evenement/nouveau.html.twig', ['formulaire' => $form]);
+        $evenement->setOrganisateur($this->getUser());
+        $em->persist($evenement);
+        $em->flush();
+        $this->addFlash('success', '✅ Événement créé !');
+        return $this->redirectToRoute('app_evenements');
     }
+
+    return $this->render('evenement/nouveau.html.twig', ['formulaire' => $form]);
+}
+
+
+
 
     #[Route('/evenements/{id}', name: 'app_evenement_detail', requirements: ['id' => '\d+'])]
     public function detail(Evenement $evenement, RequestStack $rs): Response
@@ -87,65 +98,104 @@ class EvenementController extends AbstractController
         ]);
     }
 
+
+
+
     #[Route('/evenements/{id}/modifier', name: 'app_evenement_modifier', requirements: ['id' => '\d+'])]
-    public function modifier(Evenement $evenement, Request $request, EntityManagerInterface $em): Response
-    {
-        if ($evenement->getOrganisateur() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN'))
-            throw $this->createAccessDeniedException();
+public function modifier(Evenement $evenement, Request $request, EntityManagerInterface $em, FileUploader $uploader): Response
+{
+    if ($evenement->getOrganisateur() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN'))
+        throw $this->createAccessDeniedException();
 
-        $form = $this->createForm(EvenementType::class, $evenement);
-        $form->handleRequest($request);
+    $form = $this->createForm(EvenementType::class, $evenement);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush();
-            $this->addFlash('success', '✏️ Modifié !');
-            return $this->redirectToRoute('app_evenement_detail', ['id' => $evenement->getId()]);
+    if ($form->isSubmitted() && $form->isValid()) {
+        $imageFile = $form->get('imageName')->getData();
+        if ($imageFile) {
+            if ($evenement->getImageName()) {
+                $uploader->remove($evenement->getImageName());
+            }
+            $evenement->setImageName($uploader->upload($imageFile));
         }
-
-        return $this->render('evenement/modifier.html.twig', [
-            'formulaire' => $form,
-            'evenement'  => $evenement,
-        ]);
+        $em->flush();
+        $this->addFlash('success', '✏️ Modifié !');
+        return $this->redirectToRoute('app_evenement_detail', ['id' => $evenement->getId()]);
     }
+
+    return $this->render('evenement/modifier.html.twig', [
+        'formulaire' => $form,
+        'evenement'  => $evenement,
+    ]);
+}
+
+
+
 
     #[Route('/evenements/{id}/supprimer', name: 'app_evenement_supprimer', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function supprimer(Evenement $evenement, Request $request, EntityManagerInterface $em): Response
-    {
-        if ($evenement->getOrganisateur() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN'))
-            throw $this->createAccessDeniedException();
+public function supprimer(Evenement $evenement, Request $request, EntityManagerInterface $em, FileUploader $uploader): Response
+{
+    if ($evenement->getOrganisateur() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN'))
+        throw $this->createAccessDeniedException();
 
-        if ($this->isCsrfTokenValid('supprimer_'.$evenement->getId(), $request->request->get('_token'))) {
-            $em->remove($evenement);
-            $em->flush();
-            $this->addFlash('success', '🗑️ Supprimé.');
+    if ($this->isCsrfTokenValid('supprimer_'.$evenement->getId(), $request->request->get('_token'))) {
+        if ($evenement->getImageName()) {
+            $uploader->remove($evenement->getImageName());
         }
-        return $this->redirectToRoute('app_evenements');
+        $em->remove($evenement);
+        $em->flush();
+        $this->addFlash('success', '🗑️ Supprimé.');
     }
+    return $this->redirectToRoute('app_evenements');
+}
+
+
+
 
     #[Route('/evenements/{id}/inscription', name: 'app_evenement_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function inscription(Evenement $evenement, Request $request, EntityManagerInterface $em): Response
-    {
-        $user = $this->getUser();
-        $inscription = new Inscription();
-        $inscription->setEvenement($evenement);
-        $inscription->setParticipant($user);
-        $inscription->setStatut('confirmee');
-        $inscription->setDateInscription(new \DateTime());
+#[IsGranted('ROLE_USER')]
+public function inscription(Evenement $evenement, Request $request, EntityManagerInterface $em, MailerInterface $mailer): Response
+{
+    $user = $this->getUser();
 
-        $form = $this->createForm(InscriptionType::class, $inscription);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($inscription);
-            $em->flush();
-            $this->addFlash('success', '🎫 Inscription confirmée !');
-            return $this->redirectToRoute('app_evenement_detail', ['id' => $evenement->getId()]);
-        }
+    // Vérifier si déjà inscrit
+if ($this->eventManager->estInscrit($user, $evenement)) {
+    $this->addFlash('warning', '⚠️ Vous êtes déjà inscrit !');
+    return $this->redirectToRoute('app_evenement_detail', ['id' => $evenement->getId()]);
+}
+    $inscription = new Inscription();
+    $inscription->setEvenement($evenement);
+    $inscription->setParticipant($user);
+    $inscription->setStatut('confirmee');
+    $inscription->setDateInscription(new \DateTime());
 
-        return $this->render('evenement/inscription.html.twig', [
-            'formulaire' => $form,
-            'evenement'  => $evenement,
-        ]);
+    $form = $this->createForm(InscriptionType::class, $inscription);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em->persist($inscription);
+        $em->flush();
+
+        // Envoyer email de confirmation
+        $email = (new TemplatedEmail())
+            ->from('noreply@eventspot.com')
+            ->to($user->getEmail())
+            ->subject('🎫 Inscription confirmée : ' . $evenement->getTitre())
+            ->htmlTemplate('emails/confirmation_inscription.html.twig')
+            ->context([
+                'evenement'    => $evenement,
+                'participant'  => $user,
+            ]);
+        $mailer->send($email);
+
+        $this->addFlash('success', '🎫 Inscription confirmée ! Un email vous a été envoyé.');
+        return $this->redirectToRoute('app_evenement_detail', ['id' => $evenement->getId()]);
     }
+
+    return $this->render('evenement/inscription.html.twig', [
+        'formulaire' => $form,
+        'evenement'  => $evenement,
+    ]);
+}
 }

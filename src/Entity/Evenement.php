@@ -90,7 +90,8 @@ class Evenement
     #[Groups(['event:read'])]
     private Collection $tags;
 
-    #[ORM\OneToMany(targetEntity: Inscription::class, mappedBy: 'evenement')]
+    #[ORM\OneToMany(targetEntity: Inscription::class, mappedBy: 'evenement', cascade: ['remove'])]
+
     private Collection $inscriptions;
 
     public function __construct()
