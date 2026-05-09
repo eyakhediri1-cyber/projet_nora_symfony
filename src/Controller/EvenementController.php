@@ -13,8 +13,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+use App\Service\EvenementManager;
+
 class EvenementController extends AbstractController
 {
+    public function __construct(
+        private EvenementManager $eventManager
+    ) {}
     #[Route('/', name: 'app_accueil')]
     public function accueil(EvenementRepository $evenementRepository): Response
     {
@@ -56,14 +61,20 @@ class EvenementController extends AbstractController
             'formulaire' => $form,
         ]);
     }
-
     #[Route('/evenements/{id}', name: 'app_evenement_detail', requirements: ['id' => '\d+'])]
-    public function detail(Evenement $evenement): Response
-    {
-        return $this->render('evenement/detail.html.twig', [
-            'evenement' => $evenement,
-        ]);
-    }
+public function detail(Evenement $evenement): Response
+{
+    $placesRestantes = $this->eventManager->getPlacesRestantes($evenement);
+    $nbInscrits = $this->eventManager->getNbInscrits($evenement);
+
+    return $this->render('evenement/detail.html.twig', [
+        'evenement' => $evenement,
+        'placesRestantes' => $placesRestantes,
+        'nbInscrits' => $nbInscrits,
+    ]);
+}
+    
+
 
     #[Route('/evenements/{id}/modifier', name: 'app_evenement_modifier', requirements: ['id' => '\d+'])]
     public function modifier(Evenement $evenement, Request $request, EntityManagerInterface $em): Response

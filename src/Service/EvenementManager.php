@@ -37,11 +37,20 @@ class EvenementManager
 
     public function getEvenementsParCategorie(): array
     {
-        return $this->eventRepo
-            ->createQueryBuilder('e')
-            ->select('e.categorie, COUNT(e.id) as total')
-            ->groupBy('e.categorie')
-            ->getQuery()
-            ->getResult();
+        $events = $this->eventRepo->findAll();
+
+        $stats = [];
+
+        foreach ($events as $event) {
+            $cat = $event->getCategorie();
+
+            if (!isset($stats[$cat])) {
+                $stats[$cat] = 0;
+            }
+
+            $stats[$cat]++;
+        }
+
+        return $stats;
     }
 }

@@ -8,9 +8,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\ApiResource;
 
 #[ORM\Entity(repositoryClass: LieuRepository::class)]
 #[UniqueEntity(fields: ['nom'], message: 'Ce nom de lieu existe déjà.')]
+#[ApiResource]
 class Lieu
 {
     #[ORM\Id]
