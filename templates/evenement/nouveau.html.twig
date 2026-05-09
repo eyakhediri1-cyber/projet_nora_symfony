@@ -7,72 +7,91 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-10">
-                    <div class="section-title text-center">
-                        <h2>➕ Créer un <b>événement</b></h2>
-                        <p>Remplissez le formulaire ci-dessous pour organiser un nouvel événement.</p>
+                    
+                    {# --- TITRE SECTION --- #}
+                    <div class="section-title text-center mb-5">
+                        <h2 style="color: #0b104a;">➕ Créer un <b>événement</b></h2>
+                        <p class="lead" style="color: #6b7280;">Partagez votre passion avec la communauté.</p>
                     </div>
 
-                    <div class="contact bg-white p-5 rounded-4 shadow-sm" style="border-top: 5px solid #525fe1 !important;">
+                    {# --- CARTE FORMULAIRE --- #}
+                    <div class="contact bg-white p-5 rounded-4 shadow-sm border-0" style="border-top: 6px solid #525fe1 !important; background: linear-gradient(145deg, #ffffff, #fcfdff);">
+                        
+                        {# Rappel du profil organisateur #}
+                        <div class="alert alert-light border-0 mb-5 p-3 d-flex align-items-center" style="background-color: #f0f4ff; border-radius: 12px;">
+                            <span class="ti-user me-3" style="font-size: 1.5rem; color: #525fe1;"></span>
+                            <div>
+                                <small class="text-muted d-block">Organisateur :</small>
+                                <strong>{{ app.user.pseudo }}</strong>
+                            </div>
+                        </div>
+
                         {{ form_start(formulaire, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
                             
                             <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.titre, {'attr': {'class': 'form-control'}}) }}
+                                <div class="col-md-8 mb-4">
+                                    {{ form_row(formulaire.titre, {'label': 'Titre de l\'événement', 'attr': {'class': 'form-control', 'placeholder': 'Un nom captivant...'}}) }}
                                 </div>
-                                <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.categorie, {'attr': {'class': 'form-select'}}) }}
+                                <div class="col-md-4 mb-4">
+                                    {{ form_row(formulaire.categorie, {'label': 'Type', 'attr': {'class': 'form-select'}}) }}
                                 </div>
                             </div>
 
                             <div class="mb-4">
-                                {{ form_row(formulaire.description, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+                                {{ form_row(formulaire.description, {'label': 'Description', 'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Détails, programme, informations utiles...'}}) }}
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.dateDebut, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(formulaire.dateDebut, {'label': 'Début', 'attr': {'class': 'form-control'}}) }}
                                 </div>
                                 <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.dateFin, {'attr': {'class': 'form-control'}}) }}
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.lieu, {'attr': {'class': 'form-select'}}) }}
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.capaciteMax, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(formulaire.dateFin, {'label': 'Fin', 'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.prix, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(formulaire.lieu, {'label': 'Localisation', 'attr': {'class': 'form-select'}}) }}
                                 </div>
                                 <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.statut, {'attr': {'class': 'form-select'}}) }}
+                                    {{ form_row(formulaire.capaciteMax, {'label': 'Nombre de places', 'attr': {'class': 'form-control', 'placeholder': 'Ex: 50'}}) }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    {{ form_row(formulaire.prix, {'label': 'Prix de l\'entrée (€)', 'attr': {'class': 'form-control', 'placeholder': 'Laissez vide pour gratuit'}}) }}
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    {{ form_row(formulaire.statut, {'label': 'Statut initial', 'attr': {'class': 'form-select'}}) }}
                                 </div>
                             </div>
 
                             <div class="mb-4">
-                                {{ form_row(formulaire.imageName, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_row(formulaire.imageName, {'label': 'Affiche de l\'événement', 'attr': {'class': 'form-control'}}) }}
+                                <small class="text-muted">Formats acceptés : JPG, PNG (Max 2Mo)</small>
                             </div>
 
                             <div class="mb-4">
-                                <label class="form-label h5 mb-3">🏷️ Tags associés</label>
-                                <div class="p-4 rounded-3" style="background-color: #f8f9fa; border: 1px solid #eee; max-height: 200px; overflow-y: auto;">
-                                    {{ form_widget(formulaire.tags) }}
+                                <label class="form-label fw-bold mb-3"><i class="ti-tag me-2"></i>Tags associés</label>
+                                <div class="p-4 rounded-4" style="background-color: #f8fafc; border: 1px dashed #cbd5e1; max-height: 200px; overflow-y: auto;">
+                                    <div class="custom-tags-layout">
+                                        {{ form_widget(formulaire.tags) }}
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="d-flex gap-3 mt-5">
                                 <div class="flex-grow-1">
-                                    {{ form_widget(formulaire.enregistrer, {'attr': {'class': 'btn_one w-100', 'style': 'border:none; height: 50px;'}}) }}
+                                    {{ form_widget(formulaire.enregistrer, {
+                                        'label': '✨ Créer l\'événement', 
+                                        'attr': {'class': 'btn_one w-100 shadow-sm', 'style': 'border:none; height: 55px; font-weight: 600;'}
+                                    }) }}
                                 </div>
                                 <div class="flex-grow-1">
-                                    <a href="{{ path('app_evenements') }}" class="header-btn w-100 text-center d-inline-block py-2" style="border: 2px solid #525fe1; border-radius: 50px; height: 50px; line-height: 30px;">
-                                        ← Annuler
+                                    <a href="{{ path('app_evenements') }}" class="header-btn w-100 text-center d-inline-block py-2" style="border: 2px solid #525fe1; border-radius: 50px; height: 55px; line-height: 35px; text-decoration: none; transition: 0.3s;">
+                                        Annuler
                                     </a>
                                 </div>
                             </div>
@@ -83,4 +102,27 @@
             </div>
         </div>
     </section>
+
+    <style>
+        /* Optimisation visuelle des tags pour le style luxury */
+        .custom-tags-layout .form-check {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 12px;
+            margin-bottom: 12px;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 50px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .custom-tags-layout .form-check:hover {
+            border-color: #525fe1;
+            transform: translateY(-2px);
+        }
+        .custom-tags-layout input[type="checkbox"] {
+            margin-right: 8px;
+        }
+    </style>
 {% endblock %}

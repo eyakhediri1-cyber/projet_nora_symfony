@@ -10,14 +10,22 @@
                     <h2>📅 Tous les <b>événements</b></h2>
                     <p>Découvrez la liste complète de nos événements.</p>
                 </div>
-                <a href="{{ path('app_evenement_nouveau') }}" class="btn_one">
-                    ➕ Créer un événement
-                </a>
+                
+                {# 🔒 Sécurité : Seul un organisateur (ou admin via hiérarchie) voit ce bouton #}
+                {% if is_granted('ROLE_ORGANISATEUR') %}
+                    <a href="{{ path('app_evenement_nouveau') }}" class="btn_one">
+                        ➕ Créer un événement
+                    </a>
+                {% endif %}
             </div>
 
             {% if evenements is empty %}
                 <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
-                    <p class="lead mb-0">Aucun événement pour le moment. <a href="{{ path('app_evenement_nouveau') }}" style="color: #525fe1;">Créez le premier ! 🚀</a></p>
+                    <p class="lead mb-0">Aucun événement pour le moment. 
+                        {% if is_granted('ROLE_ORGANISATEUR') %}
+                            <a href="{{ path('app_evenement_nouveau') }}" style="color: #525fe1;">Créez le premier ! 🚀</a>
+                        {% endif %}
+                    </p>
                 </div>
             {% else %}
                 <div class="table-responsive" style="background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
@@ -38,8 +46,10 @@
                                 <tr>
                                     <td>
                                         <strong>{{ evenement.titre }}</strong>
+                                        <br><small class="text-muted">Par : {{ evenement.organisateur.pseudo }}</small>
                                     </td>
                                     <td>
+                                        {# Ton bloc de catégories est parfait, on le garde tel quel #}
                                         {% if evenement.categorie == 'conference' %}
                                             <span class="badge bg-info">🎤 Conférence</span>
                                         {% elseif evenement.categorie == 'atelier' %}
@@ -81,20 +91,26 @@
                                     </td>
                                     <td>
                                         <div class="d-flex justify-content-center gap-2">
+                                            {# 👁️ Toujours visible pour tout le monde #}
                                             <a href="{{ path('app_evenement_detail', {id: evenement.id}) }}" class="btn btn-sm btn-outline-info" title="Voir les détails" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; line-height: 32px;">
                                                 👁️
                                             </a>
-                                            <a href="{{ path('app_evenement_modifier', {id: evenement.id}) }}" class="btn btn-sm btn-outline-warning" title="Modifier" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; line-height: 32px;">
-                                                ✏️
-                                            </a>
-                                            <form method="post" action="{{ path('app_evenement_supprimer', {id: evenement.id}) }}"
-                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');"
-                                                  class="d-inline">
-                                                <input type="hidden" name="_token" value="{{ csrf_token('supprimer_' ~ evenement.id) }}">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; line-height: 32px;">
-                                                    🗑️
-                                                </button>
-                                            </form>
+
+                                            {# 🔒 Sécurité : Seul l'AUTEUR de l'événement ou l'ADMIN peut modifier/supprimer #}
+                                            {% if is_granted('ROLE_ADMIN') or (app.user and app.user == evenement.organisateur) %}
+                                                <a href="{{ path('app_evenement_modifier', {id: evenement.id}) }}" class="btn btn-sm btn-outline-warning" title="Modifier" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; line-height: 32px;">
+                                                    ✏️
+                                                </a>
+                                                
+                                                <form method="post" action="{{ path('app_evenement_supprimer', {id: evenement.id}) }}"
+                                                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');"
+                                                    class="d-inline">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('supprimer_' ~ evenement.id) }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; line-height: 32px;">
+                                                        🗑️
+                                                    </button>
+                                                </form>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>

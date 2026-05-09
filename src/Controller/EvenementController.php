@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted; // Indispensable pour #[IsGranted]
 
 use App\Service\EvenementManager;
 
@@ -23,8 +24,8 @@ class EvenementController extends AbstractController
     #[Route('/', name: 'app_accueil')]
     public function accueil(EvenementRepository $evenementRepository): Response
     {
-        // 6 prochains événements publiés
-        $evenements = $evenementRepository->findUpcoming(6);
+        // On récupère les 6 prochains événements (méthode personnalisée dans ton Repository)
+        $evenements = $evenementRepository->findBy([], ['dateDebut' => 'ASC'], 6);
 
         return $this->render('evenement/accueil.html.twig', [
             'evenements' => $evenements,
@@ -42,6 +43,7 @@ class EvenementController extends AbstractController
     }
 
     #[Route('/evenements/nouveau', name: 'app_evenement_nouveau')]
+    #[IsGranted('ROLE_ORGANISATEUR')] // 🔒 Réservé aux organisateurs et admins
     public function nouveau(Request $request, EntityManagerInterface $em): Response
     {
         $evenement = new Evenement();
@@ -50,6 +52,12 @@ class EvenementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // ✅ AUTOMATISATION : On définit l'utilisateur connecté comme organisateur
+            $evenement->setOrganisateur($this->getUser());
+            
+            // ✅ AUTOMATISATION : On définit la date de création au moment présent
+            $evenement->setDateCreation(new \DateTime());
+
             $em->persist($evenement);
             $em->flush();
 
@@ -79,6 +87,12 @@ public function detail(Evenement $evenement): Response
     #[Route('/evenements/{id}/modifier', name: 'app_evenement_modifier', requirements: ['id' => '\d+'])]
     public function modifier(Evenement $evenement, Request $request, EntityManagerInterface $em): Response
     {
+        // 🔒 VÉRIFICATION DE PROPRIÉTÉ : 
+        // Si l'utilisateur n'est pas l'orga de l'event ET n'est pas Admin -> Accès refusé
+        if ($evenement->getOrganisateur() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException("Vous n'avez pas le droit de modifier cet événement.");
+        }
+
         $form = $this->createForm(EvenementType::class, $evenement);
         $form->handleRequest($request);
 
@@ -98,39 +112,35 @@ public function detail(Evenement $evenement): Response
     #[Route('/evenements/{id}/supprimer', name: 'app_evenement_supprimer', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function supprimer(Evenement $evenement, Request $request, EntityManagerInterface $em): Response
     {
+        // 🔒 VÉRIFICATION DE PROPRIÉTÉ (identique à la modification)
+        if ($evenement->getOrganisateur() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException("Action interdite.");
+        }
+
         if ($this->isCsrfTokenValid('supprimer_' . $evenement->getId(), $request->request->get('_token'))) {
             $em->remove($evenement);
             $em->flush();
 
             $this->addFlash('success', '🗑️ Événement supprimé avec succès.');
         } else {
-            $this->addFlash('danger', '⚠️ Token CSRF invalide. Suppression annulée.');
+            $this->addFlash('danger', '⚠️ Token CSRF invalide.');
         }
 
         return $this->redirectToRoute('app_evenements');
     }
 
     #[Route('/evenements/{id}/inscription', name: 'app_evenement_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function inscription(Evenement $evenement, Request $request, EntityManagerInterface $em, \App\Repository\UserRepository $userRepository): Response
+    #[IsGranted('ROLE_USER')] // 🔒 Obligation d'être connecté pour s'inscrire
+    public function inscription(Evenement $evenement, Request $request, EntityManagerInterface $em): Response
     {
-        // Simulation d'un utilisateur connecté si aucun n'existe
+        // Symfony garantit ici que $this->getUser() existe grâce au IsGranted
         $user = $this->getUser();
-        if (!$user) {
-            $user = $userRepository->findOneBy([]);
-            // Si aucun utilisateur n'existe en BDD, on en crée un par défaut
-            if (!$user) {
-                $user = new \App\Entity\User();
-                $user->setEmail('invite@example.com');
-                $user->setPseudo('Invité');
-                $user->setPassword('password'); // À adapter selon vos besoins
-                $em->persist($user);
-            }
-        }
 
         $inscription = new Inscription();
         $inscription->setEvenement($evenement);
         $inscription->setParticipant($user);
-        $inscription->setStatut('en_attente');
+        $inscription->setStatut('en_attente'); // Statut par défaut
+        $inscription->setDateInscription(new \DateTime()); // Date auto
         
         $form = $this->createForm(InscriptionType::class, $inscription);
         $form->handleRequest($request);
@@ -139,7 +149,7 @@ public function detail(Evenement $evenement): Response
             $em->persist($inscription);
             $em->flush();
 
-            $this->addFlash('success', '✅ Inscription confirmée !');
+            $this->addFlash('success', '✅ Votre demande d\'inscription a été enregistrée !');
             return $this->redirectToRoute('app_evenement_detail', ['id' => $evenement->getId()]);
         }
 

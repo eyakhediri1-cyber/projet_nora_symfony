@@ -5,6 +5,24 @@
 {% block body %}
     <section class="section-padding">
         <div class="container">
+            {# --- BARRE D'ACTIONS RAPIDES (POUR L'ORGANISATEUR) --- #}
+            {% if is_granted('ROLE_ADMIN') or (app.user and app.user == evenement.organisateur) %}
+                <div class="alert alert-light border-0 shadow-sm mb-5 d-flex justify-content-between align-items-center p-3" style="border-left: 5px solid #ffc107 !important; border-radius: 15px;">
+                    <div>
+                        <span class="badge bg-warning text-dark mb-1">Mode Organisateur</span>
+                        <p class="mb-0 small text-muted">Vous avez les droits pour gérer cet événement.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_evenement_modifier', {id: evenement.id}) }}" class="btn btn-warning btn-sm">✏️ Modifier</a>
+                        
+                        <form method="post" action="{{ path('app_evenement_supprimer', {id: evenement.id}) }}" onsubmit="return confirm('Supprimer définitivement cet événement ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('supprimer_' ~ evenement.id) }}">
+                            <button class="btn btn-outline-danger btn-sm">🗑️ Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="row g-5">
                 {# Image et informations principales #}
                 <div class="col-lg-8">
@@ -18,9 +36,11 @@
 
                     <div class="section-title mb-4">
                         <h2>{{ evenement.titre }}</h2>
+                        <p class="text-muted">Organisé par : <strong>{{ evenement.organisateur.pseudo }}</strong></p>
                     </div>
 
                     <div class="mb-4 d-flex gap-2">
+                        {# Tes badges de catégories (Parfait) #}
                         {% if evenement.categorie == 'conference' %}
                             <span class="badge bg-info">🎤 Conférence</span>
                         {% elseif evenement.categorie == 'atelier' %}
@@ -118,12 +138,26 @@
                                 </p>
                             </div>
 
+                            {# --- ZONE D'INSCRIPTION SÉCURISÉE --- #}
                             {% if evenement.statut == 'publie' and places_restantes > 0 %}
-                                <a href="{{ path('app_evenement_inscription', {id: evenement.id}) }}" class="btn_one w-100 text-center py-3">S'inscrire maintenant</a>
+                                {% if app.user %}
+                                    {# L'utilisateur est connecté #}
+                                    {% if app.user == evenement.organisateur %}
+                                        <div class="alert alert-info text-center py-3">
+                                            Vous êtes l'organisateur.
+                                        </div>
+                                    {% else %}
+                                        <a href="{{ path('app_evenement_inscription', {id: evenement.id}) }}" class="btn_one w-100 text-center py-3">S'inscrire maintenant</a>
+                                    {% endif %}
+                                {% else %}
+                                    {# Visiteur non connecté #}
+                                    <a href="{{ path('app_login') }}" class="btn btn-outline-primary w-100 py-3 mb-2">Se connecter pour s'inscrire</a>
+                                    <p class="text-center small text-muted">L'inscription nécessite un compte.</p>
+                                {% endif %}
                             {% elseif places_restantes <= 0 %}
-                                <button class="btn btn-secondary w-100 py-3" disabled>🔴 Événement complet</button>
+                                <button class="btn btn-danger w-100 py-3" disabled>🔴 Événement complet</button>
                             {% else %}
-                                <button class="btn btn-light w-100 py-3" disabled>Indisponible</button>
+                                <button class="btn btn-light w-100 py-3" disabled>🚫 Inscriptions fermées</button>
                             {% endif %}
                         </div>
 

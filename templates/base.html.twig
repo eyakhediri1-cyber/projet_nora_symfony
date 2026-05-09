@@ -6,30 +6,19 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>{% block title %}🎉 Les 2 Mousquetaires - Événements{% endblock %}</title>
         
-        <!-- Latest Bootstrap min CSS -->
-        <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">		
-        <!-- Google Font -->
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-        <!-- Font Awesome CSS -->
+        <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">        
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,100..1000&family=Jost:ital,wght@0,100..900&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
         <link rel="stylesheet" href="{{ asset('assets/fonts/font-awesome.min.css') }}">
         <link rel="stylesheet" href="{{ asset('assets/fonts/themify-icons.css') }}">
-        <!--- owl carousel Css-->
         <link rel="stylesheet" href="{{ asset('assets/owlcarousel/css/owl.carousel.css') }}">
-        <link rel="stylesheet" href="{{ asset('assets/owlcarousel/css/owl.theme.css') }}">	
-        <!--jquery-simple-mobilemenu Css-->
-        <link rel="stylesheet" href="{{ asset('assets/css/jquery-simple-mobilemenu.css') }}">			
-        <!-- MAGNIFIC CSS -->
-        <link rel="stylesheet" href="{{ asset('assets/css/magnific-popup.css') }}">		
-        <!-- animate CSS -->
-        <link rel="stylesheet" href="{{ asset('assets/css/animate.css') }}">	
-        <!-- Style CSS -->					
+        <link rel="stylesheet" href="{{ asset('assets/owlcarousel/css/owl.theme.css') }}">  
+        <link rel="stylesheet" href="{{ asset('assets/css/jquery-simple-mobilemenu.css') }}">           
+        <link rel="stylesheet" href="{{ asset('assets/css/magnific-popup.css') }}">     
+        <link rel="stylesheet" href="{{ asset('assets/css/animate.css') }}">    
         <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 
-        {% block stylesheets %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+        {% block stylesheets %}{% endblock %}
 
         {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
         {% if frankenphpHotReload %}
@@ -38,61 +27,172 @@
         <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
         {% endif %}
     </head>
+
     <body data-spy="scroll" data-offset="80">
-        <!-- START PRELOADER -->
         <div class="preloaders">
             <span class="loader"></span>
         </div>
-        <!-- END PRELOADER -->
 
-        <!-- START NAVBAR -->  
         <div id="navigation" class="navbar-light bg-faded site-navigation">
             <div class="container-fluid">
                 <div class="row">
+
+                    {# ===== LOGO ===== #}
                     <div class="col-20 align-self-center">
                         <div class="site-logo">
-                            <a href="{{ path('app_accueil') }}"><img src="{{ asset('assets/img/logo.png') }}" alt="Logo"></a>          				
+                            <a href="{{ path('app_accueil') }}">
+                                <img src="{{ asset('assets/img/nora.png') }}" alt="Logo">
+                            </a>                       
                         </div>
-                    </div><!--- END Col -->
+                    </div>
                     
+                    {# ===== MENU PRINCIPAL ===== #}
                     <div class="col-60 d-flex">
                         <nav id="main-menu">
                             <ul>
-                                <li><a href="{{ path('app_accueil') }}" class="{{ app.request.get('_route') == 'app_accueil' ? 'active' : '' }}">🏠 Accueil</a></li>
-                                <li><a href="{{ path('app_evenements') }}" class="{{ app.request.get('_route') starts with 'app_evenement' ? 'active' : '' }}">📅 Événements</a></li>
-                                <li><a href="{{ path('app_lieux') }}" class="{{ app.request.get('_route') starts with 'app_lieu' ? 'active' : '' }}">📍 Lieux</a></li>
-                                <li><a href="{{ path('app_tags') }}" class="{{ app.request.get('_route') starts with 'app_tag' ? 'active' : '' }}">🏷️ Tags</a></li>
+                                <li>
+                                    <a href="{{ path('app_accueil') }}" class="{{ app.request.get('_route') == 'app_accueil' ? 'active' : '' }}">
+                                        🏠 Accueil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_evenements') }}" class="{{ app.request.get('_route') starts with 'app_evenement' ? 'active' : '' }}">
+                                        📅 Événements
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_lieux') }}" class="{{ app.request.get('_route') starts with 'app_lieu' ? 'active' : '' }}">
+                                        📍 Lieux
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ path('app_tags') }}" class="{{ app.request.get('_route') starts with 'app_tag' ? 'active' : '' }}">
+                                        🏷️ Tags
+                                    </a>
+                                </li>
+
+                                {# ===== MENU ADMIN ===== #}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <li>
+                                        <a href="{{ path('app_admin_users') }}" 
+                                           class="{{ app.request.get('_route') starts with 'app_admin' ? 'active' : '' }}"
+                                           style="color: #d9534f;">
+                                            ⚙️ Administration
+                                        </a>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </nav>
-                    </div><!--- END Col -->
+                    </div>
                     
+                    {# ===== BOUTONS CONNEXION / PROFIL ===== #}
                     <div class="col-20 d-none d-xl-block text-end align-self-center">
-                        <a href="{{ path('app_login') }}" class="header-btn">Connexion</a>
-                        <a href="{{ path('app_register') }}" class="btn_one">S'inscrire</a>
+                        {% if app.user %}
+                            <div class="dropdown d-inline-block">
+                                <button class="btn_one dropdown-toggle" type="button" id="userMenu" 
+                                        data-bs-toggle="dropdown" aria-expanded="false" 
+                                        style="padding: 10px 25px; border-radius: 50px;">
+                                    <i class="ti-user me-2"></i>{{ app.user.pseudo }}
+                                    
+                                    {# Badge rôle #}
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <span class="badge bg-danger ms-1" style="font-size: 10px;">ADMIN</span>
+                                    {% else %}
+                                        <span class="badge bg-primary ms-1" style="font-size: 10px;">USER</span>
+                                    {% endif %}
+                                </button>
 
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-3" aria-labelledby="userMenu">
+                                    
+                                    {# Infos utilisateur #}
+                                    <li class="px-3 py-2 border-bottom">
+                                        <small class="text-muted d-block">Connecté en tant que</small>
+                                        <span class="fw-bold">{{ app.user.email }}</span>
+                                        <br>
+                                        {% if is_granted('ROLE_ADMIN') %}
+                                            <span class="badge bg-danger mt-1">Administrateur</span>
+                                        {% else %}
+                                            <span class="badge bg-primary mt-1">Utilisateur</span>
+                                        {% endif %}
+                                    </li>
 
-                    </div><!--- END Col -->
+                                    <li>
+                                        <a class="dropdown-item py-2" href="#">
+                                            <i class="ti-id-badge me-2 text-primary"></i>Mon Profil
+                                        </a>
+                                    </li>
+
+                                    {# Lien admin #}
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <li>
+                                            <a class="dropdown-item py-2" href="{{ path('app_admin_users') }}">
+                                                <i class="ti-settings me-2 text-danger"></i>Gérer les utilisateurs
+                                            </a>
+                                        </li>
+                                    {% endif %}
+
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item py-2 text-danger" href="{{ path('app_logout') }}">
+                                            <i class="ti-power-off me-2"></i>Déconnexion
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        {% else %}
+                            <a href="{{ path('app_login') }}" class="header-btn" style="text-decoration: none;">
+                                Connexion
+                            </a>
+                            <a href="{{ path('app_register') }}" class="btn_one" style="text-decoration: none; border-radius: 50px;">
+                                S'inscrire
+                            </a>
+                        {% endif %}
+                    </div>
                     
-                    <ul class="mobile_menu">						
+                    {# ===== MENU MOBILE ===== #}
+                    <ul class="mobile_menu">                        
                         <li><a href="{{ path('app_accueil') }}">🏠 Accueil</a></li>
                         <li><a href="{{ path('app_evenements') }}">📅 Événements</a></li>
                         <li><a href="{{ path('app_lieux') }}">📍 Lieux</a></li>
                         <li><a href="{{ path('app_tags') }}">🏷️ Tags</a></li>
-                    </ul>			
-                </div><!--- END ROW -->
-            </div><!--- END CONTAINER -->
-        </div> 	  
-        <!-- END NAVBAR -->
 
-        <!-- Main Content -->
-        <main style="padding-top: 100px; min-height: 70vh;">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li><a href="{{ path('app_admin_users') }}" style="color: #d9534f;">⚙️ Administration</a></li>
+                        {% endif %}
+
+                        <hr>
+
+                        {% if app.user %}
+                            <li class="px-3 py-2 text-muted small">
+                                👤 {{ app.user.pseudo }}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <span class="badge bg-danger ms-1">ADMIN</span>
+                                {% else %}
+                                    <span class="badge bg-primary ms-1">USER</span>
+                                {% endif %}
+                            </li>
+                            <li><a href="{{ path('app_logout') }}" class="text-danger">🚪 Déconnexion</a></li>
+                        {% else %}
+                            <li><a href="{{ path('app_login') }}">🔑 Connexion</a></li>
+                            <li><a href="{{ path('app_register') }}">📝 S'inscrire</a></li>
+                        {% endif %}
+                    </ul>           
+                </div>
+            </div>
+        </div>    
+
+        {# ===== CONTENU PRINCIPAL ===== #}
+        <main style="padding-top: 120px; min-height: 75vh;">
             <div class="container">
-                {# Messages flash #}
+
+                {# Messages Flash #}
                 {% for label, messages in app.flashes %}
-                    {% set alertType = label == 'success' ? 'success' : (label == 'danger' ? 'danger' : 'warning') %}
                     {% for message in messages %}
-                        <div class="alert alert-{{ alertType }} alert-dismissible fade show" role="alert">
-                            {{ message }}
+                        <div class="alert alert-{{ label == 'danger' ? 'danger' : (label == 'success' ? 'success' : 'info') }} alert-dismissible fade show rounded-4 shadow-sm mb-4 border-0" role="alert">
+                            <div class="d-flex align-items-center">
+                                <i class="ti-{{ label == 'success' ? 'check' : 'info-alt' }} me-3" style="font-size: 1.2rem;"></i>
+                                <div>{{ message }}</div>
+                            </div>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endfor %}
@@ -102,63 +202,66 @@
             </div>
         </main>
 
-        <!-- START FOOTER -->
-        <footer class="footer_area" style="background-color: #1a1a1a; color: white; padding: 50px 0;">
+        {# ===== FOOTER ===== #}
+        <footer class="footer_area" style="background-color: #1a1a1a; color: white; padding: 60px 0 30px;">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                    <div class="col-lg-4 col-sm-6">
                         <div class="single_footer">
-                            <a href="{{ path('app_accueil') }}"><img src="{{ asset('assets/img/logo.png') }}" alt="Logo"></a>
-                            <p>Les 2 Mousquetaires - Votre plateforme de gestion d'événements préférée.</p>
+                            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="mb-3">
+                            <p>Les 2 Mousquetaires : La passion rencontre l'organisation pour des événements inoubliables dans votre région.</p>
+                            <div class="social_links mt-4">
+                                <a href="#" class="me-3 text-white"><i class="ti-facebook"></i></a>
+                                <a href="#" class="me-3 text-white"><i class="ti-instagram"></i></a>
+                                <a href="#" class="text-white"><i class="ti-twitter"></i></a>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                    <div class="col-lg-2 col-sm-6 offset-lg-1">
                         <div class="single_footer">
-                            <h4>Liens rapides</h4>
-                            <ul>
-                                <li><a href="{{ path('app_accueil') }}">Accueil</a></li>
-                                <li><a href="{{ path('app_evenements') }}">Événements</a></li>
-                                <li><a href="{{ path('app_lieux') }}">Lieux</a></li>
+                            <h4>Explorer</h4>
+                            <ul class="list-unstyled">
+                                <li><a href="{{ path('app_accueil') }}" class="text-white-50">Accueil</a></li>
+                                <li><a href="{{ path('app_evenements') }}" class="text-white-50">Événements</a></li>
+                                <li><a href="{{ path('app_lieux') }}" class="text-white-50">Lieux</a></li>
+                                <li><a href="{{ path('app_tags') }}" class="text-white-50">Tags</a></li>
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <li><a href="{{ path('app_admin_users') }}" class="text-danger">⚙️ Admin</a></li>
+                                {% endif %}
                             </ul>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                    <div class="col-lg-4 col-sm-6 offset-lg-1">
                         <div class="single_footer">
-                            <h4>Contact</h4>
-                            <p>Email: contact@2mousquetaires.com</p>
+                            <h4>Support & Contact</h4>
+                            <p class="text-white-50">Une question ? Un partenariat ?</p>
+                            <p><i class="ti-email me-2 text-primary"></i> contact@2mousquetaires.tn</p>
+                            <p><i class="ti-location-pin me-2 text-primary"></i> Tunis, Tunisie</p>
                         </div>
+                    </div>
+                </div>
+                <div class="row mt-5 pt-4 border-top border-secondary">
+                    <div class="col-12 text-center">
+                        <p class="mb-0 text-white-50">
+                            &copy; {{ "now"|date("Y") }} Les 2 Mousquetaires. Made with 💙 by Eya.
+                        </p>
                     </div>
                 </div>
             </div>
         </footer>
-        <!-- END FOOTER COPYRIGHT -->
-        <div class="foot_copy" style="background-color: #111; padding: 20px 0; text-align: center; color: #888;">
-            <p>&copy; {{ "now"|date("Y") }} Les 2 Mousquetaires. Tous droits réservés.</p>
-        </div>
 
-        <!-- Latest jQuery -->
+        {# ===== SCRIPTS ===== #}
         <script src="{{ asset('assets/js/jquery-1.12.4.min.js') }}"></script>
-        <!-- Latest compiled and minified Bootstrap -->
         <script src="{{ asset('assets/bootstrap/js/bootstrap.min.js') }}"></script>
-        <!-- modernizer JS -->
         <script src="{{ asset('assets/js/modernizr-2.8.3.min.js') }}"></script>
-        <!-- jquery-simple-mobilemenu.min -->
         <script src="{{ asset('assets/js/jquery-simple-mobilemenu.js') }}"></script>
-        <!-- owl-carousel min js  -->
         <script src="{{ asset('assets/owlcarousel/js/owl.carousel.min.js') }}"></script>
-        <!-- magnific-popup js -->               
         <script src="{{ asset('assets/js/jquery.magnific-popup.min.js') }}"></script>
-        <!-- countTo js -->
         <script src="{{ asset('assets/js/jquery.inview.min.js') }}"></script>
-        <!-- scrolltopcontrol js -->
         <script src="{{ asset('assets/js/scrolltopcontrol.js') }}"></script>
-        <!-- WOW - Reveal Animations When You Scroll -->
         <script src="{{ asset('assets/js/wow.min.js') }}"></script>
-        <!-- scripts js -->
         <script src="{{ asset('assets/js/scripts.js') }}"></script>
         
-        {% block javascripts %}
-        {% endblock %}
+        {% block javascripts %}{% endblock %}
     </body>
 </html>
-
