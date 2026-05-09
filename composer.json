@@ -8,7 +8,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "api-platform/doctrine-orm": "^4.3",
-        "api-platform/symfony": "^4.3",
+        "api-platform/symfony": "*",
         "doctrine/doctrine-bundle": "^3.2",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.6",
@@ -44,7 +44,7 @@
         "symfony/validator": "7.4.*",
         "symfony/web-link": "7.4.*",
         "symfony/yaml": "7.4.*",
-        "symfonycasts/verify-email-bundle": "^1.18",
+        "symfonycasts/verify-email-bundle": "*",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0"
     },
