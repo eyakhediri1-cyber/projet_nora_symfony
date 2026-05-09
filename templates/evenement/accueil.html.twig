@@ -15,15 +15,22 @@
                     <div class="home_sb">
                         <div class="d-flex gap-3 mt-4">
                             <a href="{{ path('app_evenements') }}" class="btn_one" style="padding: 15px 30px; display: inline-block;">📅 Voir les événements</a>
-                            <a href="{{ path('app_evenement_nouveau') }}" class="header-btn" style="padding: 15px 30px; border: 2px solid #525fe1; border-radius: 50px;">➕ Créer un événement</a>
+                            
+                            {# 🔒 SÉCURITÉ : On n'affiche "Créer" que si l'utilisateur peut le faire #}
+                            {% if is_granted('ROLE_ORGANISATEUR') %}
+                                <a href="{{ path('app_evenement_nouveau') }}" class="header-btn" style="padding: 15px 30px; border: 2px solid #525fe1; border-radius: 50px; background: white;">➕ Créer un événement</a>
+                            {% elseif not app.user %}
+                                {# Optionnel : On peut inviter les gens à s'inscrire s'ils ne sont pas connectés #}
+                                <a href="{{ path('app_register') }}" class="header-btn" style="padding: 15px 30px; border: 2px solid #525fe1; border-radius: 50px; background: white;">🚀 Rejoignez-nous</a>
+                            {% endif %}
                         </div>
-                    </div>					
+                    </div>                  
                 </div><!--- END COL -->
                 <div class="col-lg-6 col-sm-12 col-xs-12">
                     <div class="hero-text-img">
                         <img src="{{ asset('assets/img/home-img2.png') }}" class="img-fluid" alt="" />
-                    </div>					
-                </div><!--- END COL -->						  
+                    </div>                  
+                </div><!--- END COL -->                       
             </div><!--- END ROW -->
         </div><!--- END CONTAINER -->
     </section>
@@ -36,9 +43,10 @@
                 <div class="col-lg-3 col-sm-6 col-xs-12">
                     <div class="single-counter">
                         <span class="ti-folder sc_one"></span>
+                        {# Utilisation de .length sur la variable passée par le controller #}
                         <h2 class="counter-num">{{ evenements|length }}+</h2>
-                        <p>Événements à venir</p>
-                    </div>							
+                        <p>Événements à la une</p>
+                    </div>                          
                 </div>
                 <div class="col-lg-3 col-sm-6 col-xs-12">
                     <div class="single-counter">
@@ -46,23 +54,23 @@
                         <h2 class="counter-num">10+</h2>
                         <p>Lieux partenaires</p>
                     </div>
-                </div><!-- END COL -->
+                </div>
                 <div class="col-lg-3 col-sm-6 col-xs-12">
                     <div class="single-counter">
                         <span class="ti-id-badge sc_three"></span>
                         <h2 class="counter-num">100%</h2>
                         <p>Passion</p>
                     </div>
-                </div><!-- END COL -->
+                </div>
                 <div class="col-lg-3 col-sm-6 col-xs-12">
                     <div class="single-counter">
                         <span class="ti-user sc_four"></span>
                         <h2 class="counter-num">Active</h2>
                         <p>Communauté</p>
                     </div>
-                </div><!-- END COL -->						
-            </div><!--- END ROW -->
-        </div><!--- END CONTAINER -->
+                </div>                      
+            </div>
+        </div>
     </section>
     <!-- END COUNTER -->
 
@@ -97,6 +105,7 @@
                             
                             <div class="course_content" style="padding: 25px;">
                                 <div class="mb-2">
+                                    {# Catégories badges #}
                                     {% if evenement.categorie == 'conference' %}
                                         <span class="badge bg-info">🎤 Conférence</span>
                                     {% elseif evenement.categorie == 'atelier' %}
@@ -119,7 +128,10 @@
 
                                 {# Jauge de remplissage #}
                                 {% set places_occupees = evenement.inscriptions|length %}
-                                {% set pourcentage = (places_occupees / evenement.capaciteMax * 100)|round %}
+                                {# Sécurité pour éviter division par zéro si capacitéMax est mal saisie #}
+                                {% set capacite = evenement.capaciteMax > 0 ? evenement.capaciteMax : 1 %}
+                                {% set pourcentage = (places_occupees / capacite * 100)|round %}
+                                
                                 <div class="mb-4">
                                     <div class="d-flex justify-content-between mb-1">
                                         <small>Remplissage</small>
@@ -132,7 +144,10 @@
 
                                 <div class="d-flex justify-content-between align-items-center">
                                     <a href="{{ path('app_evenement_detail', {id: evenement.id}) }}" class="btn_one" style="padding: 8px 20px; font-size: 14px;">Détails</a>
-                                    <span class="text-muted small">{{ evenement.inscriptions|length }} inscrits</span>
+                                    <span class="text-muted small">
+                                        {# Affichage de l'organisateur pour la transparence #}
+                                       Par : <strong>{{ evenement.organisateur.pseudo ?? 'Organisateur inconnu' }}</strong>
+                                    </span>
                                 </div>
                             </div>
                         </div>

@@ -1,0 +1,160 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+<section class="d-flex align-items-center justify-content-center" style="min-height: 85vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 20px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="auth-card p-5 shadow-lg" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.3);">
+                    
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold" style="color: #2D3E50; letter-spacing: -1px;">Créer un compte</h2>
+                        <p class="text-muted small">Rejoignez l'aventure dès aujourd'hui</p>
+                    </div>
+
+                    {% for flash_error in app.flashes('verify_email_error') %}
+                        <div class="alert alert-danger rounded-3 small" role="alert">{{ flash_error }}</div>
+                    {% endfor %}
+
+                    {{ form_errors(registrationForm) }}
+
+                    {{ form_start(registrationForm) }}
+                        
+                        {# --- PSEUDO --- #}
+                        <div class="mb-3">
+                            <label class="form-label small text-uppercase fw-bold text-muted" style="font-size: 11px;">Pseudo</label>
+                            {{ form_widget(registrationForm.pseudo, {
+                                'attr': {
+                                    'class': 'form-control custom-input', 
+                                    'placeholder': 'Votre pseudo'
+                                }
+                            }) }}
+                            {{ form_errors(registrationForm.pseudo) }}
+                        </div>
+
+                        {# --- EMAIL --- #}
+                        <div class="mb-3">
+                            <label class="form-label small text-uppercase fw-bold text-muted" style="font-size: 11px;">Adresse Email</label>
+                            {{ form_widget(registrationForm.email, {
+                                'attr': {
+                                    'class': 'form-control custom-input', 
+                                    'placeholder': 'nom@exemple.com'
+                                }
+                            }) }}
+                            {{ form_errors(registrationForm.email) }}
+                        </div>
+
+                        {# --- MOT DE PASSE --- #}
+                        <div class="mb-3">
+                            <label class="form-label small text-uppercase fw-bold text-muted" style="font-size: 11px;">Mot de passe</label>
+                            {{ form_widget(registrationForm.plainPassword, {
+                                'attr': {
+                                    'class': 'form-control custom-input', 
+                                    'placeholder': '••••••••'
+                                }
+                            }) }}
+                            {{ form_errors(registrationForm.plainPassword) }}
+                        </div>
+
+                        {# --- CHOIX DU RÔLE --- #}
+                        <div class="mb-4">
+                            <label class="form-label small text-uppercase fw-bold text-muted d-block mb-2" style="font-size: 11px;">Je suis un</label>
+                            <div class="d-flex gap-3">
+
+                                {% for child in registrationForm.roleChoice %}
+                                    <label class="role-card flex-fill text-center p-3" 
+                                           style="cursor: pointer; border-radius: 14px; border: 2px solid #e9ecef; transition: all 0.3s ease;">
+                                        {{ form_widget(child) }}
+                                        {% if child.vars.value == 'ROLE_USER' %}
+                                            <div class="mt-1">
+                                                <i class="ti-user" style="font-size: 22px; color: #5D5FEF;"></i>
+                                                <div class="fw-bold small mt-1" style="color: #2D3E50;">Utilisateur</div>
+                                                <div class="text-muted" style="font-size: 10px;">Parcourir & s'inscrire</div>
+                                            </div>
+                                        {% else %}
+                                            <div class="mt-1">
+                                                <i class="ti-crown" style="font-size: 22px; color: #d9534f;"></i>
+                                                <div class="fw-bold small mt-1" style="color: #2D3E50;">Administrateur</div>
+                                                <div class="text-muted" style="font-size: 10px;">Gérer la plateforme</div>
+                                            </div>
+                                        {% endif %}
+                                    </label>
+                                {% endfor %}
+
+                            </div>
+                            {{ form_errors(registrationForm.roleChoice) }}
+                        </div>
+
+                        {# --- CONDITIONS D'UTILISATION --- #}
+                        <div class="mb-4 form-check d-flex align-items-center">
+                            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input me-2'}}) }}
+                            <label class="form-check-label small text-muted mb-0">J'accepte les conditions d'utilisation</label>
+                        </div>
+
+                        {# --- BOUTON SUBMIT --- #}
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow-sm" 
+                                style="border-radius: 12px; background: #5D5FEF; border: none; transition: all 0.3s ease;">
+                            S'inscrire maintenant
+                        </button>
+
+                    {{ form_end(registrationForm) }}
+
+                    <div class="text-center mt-4">
+                        <p class="small text-muted">
+                            Déjà membre ? 
+                            <a href="{{ path('app_login') }}" style="color: #5D5FEF; text-decoration: none;" class="fw-bold">
+                                Connectez-vous
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .custom-input {
+        background: #f8f9fa !important;
+        border: 2px solid transparent !important;
+        padding: 14px 18px !important;
+        border-radius: 12px !important;
+        font-size: 15px !important;
+        transition: all 0.3s ease !important;
+    }
+    .custom-input:focus {
+        background: #ffffff !important;
+        border-color: rgba(93, 95, 239, 0.2) !important;
+        box-shadow: 0 8px 20px rgba(93, 95, 239, 0.05) !important;
+        transform: translateY(-2px);
+    }
+    .auth-card {
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .auth-card:hover { 
+        transform: scale(1.01); 
+    }
+    .btn-primary:hover {
+        background: #4a4cd9 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(93, 95, 239, 0.2) !important;
+    }
+
+    /* ===== STYLE DES CARTES DE RÔLE ===== */
+    .role-card input[type="radio"] {
+        display: none;
+    }
+    .role-card:has(input[type="radio"]:checked) {
+        border-color: #5D5FEF !important;
+        background: rgba(93, 95, 239, 0.05);
+        box-shadow: 0 4px 15px rgba(93, 95, 239, 0.15);
+    }
+    .role-card:hover {
+        border-color: #5D5FEF !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(93, 95, 239, 0.1);
+    }
+</style>
+{% endblock %}

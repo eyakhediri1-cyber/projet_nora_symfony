@@ -17,61 +17,80 @@
                             
                             <div class="row">
                                 <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.titre, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(formulaire.titre, {'label': 'Titre de l\'événement', 'attr': {'class': 'form-control', 'placeholder': 'Ex: Conférence Tech'}}) }}
                                 </div>
                                 <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.categorie, {'attr': {'class': 'form-select'}}) }}
+                                    {{ form_row(formulaire.categorie, {'label': 'Catégorie', 'attr': {'class': 'form-select'}}) }}
                                 </div>
                             </div>
 
                             <div class="mb-4">
-                                {{ form_row(formulaire.description, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+                                {{ form_row(formulaire.description, {'label': 'Description détaillée', 'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Décrivez votre événement...'}}) }}
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.dateDebut, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(formulaire.dateDebut, {'label': 'Date de début', 'attr': {'class': 'form-control'}}) }}
                                 </div>
                                 <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.dateFin, {'attr': {'class': 'form-control'}}) }}
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.lieu, {'attr': {'class': 'form-select'}}) }}
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.capaciteMax, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(formulaire.dateFin, {'label': 'Date de fin', 'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.prix, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_row(formulaire.lieu, {'label': 'Lieu', 'attr': {'class': 'form-select'}}) }}
                                 </div>
                                 <div class="col-md-6 mb-4">
-                                    {{ form_row(formulaire.statut, {'attr': {'class': 'form-select'}}) }}
+                                    {{ form_row(formulaire.capaciteMax, {'label': 'Nombre de places max', 'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    {{ form_row(formulaire.prix, {'label': 'Prix (€)', 'attr': {'class': 'form-control', 'placeholder': 'Laissez vide si gratuit'}}) }}
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    {{ form_row(formulaire.statut, {'label': 'Statut de publication', 'attr': {'class': 'form-select'}}) }}
                                 </div>
                             </div>
 
                             <div class="mb-4">
-                                {{ form_row(formulaire.imageName, {'attr': {'class': 'form-control'}}) }}
+                                <label class="form-label fw-bold">🖼️ Image de l'événement</label>
+                                <div class="row align-items-center">
+                                    {% if evenement.imageName %}
+                                        <div class="col-md-3 mb-3 mb-md-0">
+                                            <div class="position-relative">
+                                                <img src="/uploads/evenements/{{ evenement.imageName }}" class="img-fluid rounded-3 shadow-sm border" alt="Actuelle">
+                                                <span class="badge bg-dark position-absolute bottom-0 start-0 m-1 opacity-75" style="font-size: 0.7rem;">Actuelle</span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    <div class="{% if evenement.imageName %}col-md-9{% else %}col-12{% endif %}">
+                                        {{ form_widget(formulaire.imageName, {'attr': {'class': 'form-control'}}) }}
+                                        <small class="text-muted">Laissez vide pour conserver l'image actuelle.</small>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="mb-4">
-                                <label class="form-label h5 mb-3">🏷️ Tags associés</label>
-                                <div class="p-4 rounded-3" style="background-color: #f8f9fa; border: 1px solid #eee; max-height: 200px; overflow-y: auto;">
-                                    {{ form_widget(formulaire.tags) }}
+                                <label class="form-label fw-bold mb-3">🏷️ Tags associés</label>
+                                <div class="p-4 rounded-4 shadow-inner" style="background-color: #fcfdff; border: 1px dashed #525fe1; max-height: 200px; overflow-y: auto;">
+                                    <div class="custom-tags-grid">
+                                        {{ form_widget(formulaire.tags) }}
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="d-flex gap-3 mt-5">
                                 <div class="flex-grow-1">
-                                    {{ form_widget(formulaire.enregistrer, {'attr': {'class': 'btn_one w-100', 'style': 'border:none; height: 50px;'}}) }}
+                                    {{ form_widget(formulaire.enregistrer, {
+                                        'label': '💾 Enregistrer les modifications', 
+                                        'attr': {'class': 'btn_one w-100', 'style': 'border:none; height: 50px;'}
+                                    }) }}
                                 </div>
                                 <div class="flex-grow-1">
-                                    <a href="{{ path('app_evenement_detail', {id: evenement.id}) }}" class="header-btn w-100 text-center d-inline-block py-2" style="border: 2px solid #525fe1; border-radius: 50px; height: 50px; line-height: 30px;">
+                                    <a href="{{ path('app_evenement_detail', {id: evenement.id}) }}" class="header-btn w-100 text-center d-inline-block py-2" style="border: 2px solid #525fe1; border-radius: 50px; height: 50px; line-height: 30px; text-decoration: none;">
                                         ← Annuler
                                     </a>
                                 </div>
@@ -83,4 +102,22 @@
             </div>
         </div>
     </section>
+
+    {# Petit style interne pour rendre les checkbox plus jolies #}
+    <style>
+        .custom-tags-grid .form-check {
+            display: inline-block;
+            margin-right: 15px;
+            margin-bottom: 10px;
+            padding: 5px 15px 5px 30px;
+            background: #fff;
+            border-radius: 50px;
+            border: 1px solid #eee;
+            transition: 0.3s;
+        }
+        .custom-tags-grid .form-check:hover {
+            border-color: #525fe1;
+            background: #f8f9ff;
+        }
+    </style>
 {% endblock %}
