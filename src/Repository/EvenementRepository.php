@@ -58,7 +58,7 @@ class EvenementRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-    public function findByFilters(?string $titre, ?string $categorie, ?string $ville): array
+    public function findByFilters(?string $titre, ?string $categorie, ?string $ville)
 {
     $qb = $this->createQueryBuilder('e')
         ->leftJoin('e.lieu', 'l')
@@ -68,18 +68,19 @@ class EvenementRepository extends ServiceEntityRepository
         $qb->andWhere('e.titre LIKE :titre')
            ->setParameter('titre', '%'.$titre.'%');
     }
+
     if ($categorie) {
         $qb->andWhere('e.categorie = :cat')
            ->setParameter('cat', $categorie);
     }
+
     if ($ville) {
         $qb->andWhere('l.ville LIKE :ville')
            ->setParameter('ville', '%'.$ville.'%');
     }
 
     return $qb->orderBy('e.dateDebut', 'ASC')
-              ->getQuery()
-              ->getResult();
+              ->getQuery(); // ✅ IMPORTANT: Query PAS result
 }
 
 }

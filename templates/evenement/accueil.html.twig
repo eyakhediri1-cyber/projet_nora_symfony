@@ -3,161 +3,169 @@
 {% block title %}🎉 Accueil - Les 2 Mousquetaires{% endblock %}
 
 {% block body %}
-    <!-- START HOME -->
-    <section class="home_bg hb_height" style="background-image: url({{ asset('assets/img/bg/home-bg.jpg') }}); background-size: cover; background-position: center center; margin-top: -100px; padding-bottom: 100px;">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6 col-sm-12 col-xs-12">
-                    <div class="hero-text ht_top">
-                        <h1><span>Smart Events</span> Où la passion rencontre l'organisation</h1>
-                        <p>Découvrez et participez aux événements les plus intéressants de votre région avec Les 2 Mousquetaires.</p>
-                    </div>
-                    <div class="home_sb">
-                        <div class="d-flex gap-3 mt-4">
-                            <a href="{{ path('app_evenements') }}" class="btn_one" style="padding: 15px 30px; display: inline-block;">📅 Voir les événements</a>
-                            
-                            {# 🔒 SÉCURITÉ : On n'affiche "Créer" que si l'utilisateur peut le faire #}
-                            {% if is_granted('ROLE_ORGANISATEUR') %}
-                                <a href="{{ path('app_evenement_nouveau') }}" class="header-btn" style="padding: 15px 30px; border: 2px solid #525fe1; border-radius: 50px; background: white;">➕ Créer un événement</a>
-                            {% elseif not app.user %}
-                                {# Optionnel : On peut inviter les gens à s'inscrire s'ils ne sont pas connectés #}
-                                <a href="{{ path('app_register') }}" class="header-btn" style="padding: 15px 30px; border: 2px solid #525fe1; border-radius: 50px; background: white;">🚀 Rejoignez-nous</a>
-                            {% endif %}
+
+<!-- START HOME -->
+<section class="home_bg hb_height"
+    style="background-image: url({{ asset('assets/img/bg/home-bg.jpg') }}); background-size: cover; background-position: center center; margin-top: -100px; padding-bottom: 100px;">
+
+    <div class="container">
+        <div class="row">
+
+            <!-- LEFT -->
+            <div class="col-lg-6 col-sm-12">
+                <div class="hero-text ht_top">
+
+                    <h1><span>Smart Events</span> Où la passion rencontre l'organisation</h1>
+
+                    <p>
+                        Découvrez et participez aux événements les plus intéressants de votre région avec Les 2 Mousquetaires.
+                    </p>
+
+                    <!-- RECENTS (1 SEUL BLOC PROPRE) -->
+                    {% if recents is defined and recents|length > 0 %}
+                        <div class="mt-4">
+                            <h4>📋 Derniers événements consultés</h4>
+
+                            <ul>
+                                {% for e in recents %}
+                                    <li>
+                                        <a href="{{ path('app_evenement_detail', {id: e.id}) }}">
+                                            {{ e.titre }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                    </div>                  
-                </div><!--- END COL -->
-                <div class="col-lg-6 col-sm-12 col-xs-12">
-                    <div class="hero-text-img">
-                        <img src="{{ asset('assets/img/home-img2.png') }}" class="img-fluid" alt="" />
-                    </div>                  
-                </div><!--- END COL -->                       
-            </div><!--- END ROW -->
-        </div><!--- END CONTAINER -->
-    </section>
-    <!-- END  HOME -->
+                    {% endif %}
 
-    <!-- START COUNTER -->
-    <section class="count_area counter_feature">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-sm-6 col-xs-12">
-                    <div class="single-counter">
-                        <span class="ti-folder sc_one"></span>
-                        {# Utilisation de .length sur la variable passée par le controller #}
-                        <h2 class="counter-num">{{ evenements|length }}+</h2>
-                        <p>Événements à la une</p>
-                    </div>                          
                 </div>
-                <div class="col-lg-3 col-sm-6 col-xs-12">
-                    <div class="single-counter">
-                        <span class="ti-medall-alt sc_two"></span>
-                        <h2 class="counter-num">10+</h2>
-                        <p>Lieux partenaires</p>
+
+                <div class="home_sb">
+                    <div class="d-flex gap-3 mt-4">
+
+                        <a href="{{ path('app_evenements') }}" class="btn_one">
+                            📅 Voir les événements
+                        </a>
+
+                        {% if is_granted('ROLE_ORGANISATEUR') %}
+                            <a href="{{ path('app_evenement_nouveau') }}"
+                               class="header-btn"
+                               style="border:2px solid #525fe1; border-radius:50px; padding:15px 30px;">
+                                ➕ Créer un événement
+                            </a>
+
+                        {% elseif not app.user %}
+                            <a href="{{ path('app_register') }}"
+                               class="header-btn"
+                               style="border:2px solid #525fe1; border-radius:50px; padding:15px 30px;">
+                                🚀 Rejoignez-nous
+                            </a>
+                        {% endif %}
+
                     </div>
                 </div>
-                <div class="col-lg-3 col-sm-6 col-xs-12">
-                    <div class="single-counter">
-                        <span class="ti-id-badge sc_three"></span>
-                        <h2 class="counter-num">100%</h2>
-                        <p>Passion</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-sm-6 col-xs-12">
-                    <div class="single-counter">
-                        <span class="ti-user sc_four"></span>
-                        <h2 class="counter-num">Active</h2>
-                        <p>Communauté</p>
-                    </div>
-                </div>                      
+
             </div>
+
+            <!-- RIGHT -->
+            <div class="col-lg-6 col-sm-12">
+                <div class="hero-text-img">
+                    <img src="{{ asset('assets/img/home-img2.png') }}" class="img-fluid">
+                </div>
+            </div>
+
         </div>
-    </section>
-    <!-- END COUNTER -->
+    </div>
+</section>
+<!-- END HOME -->
 
-    {# Prochains événements #}
-    <section class="section-padding">
-        <div class="container">
-            <div class="section-title text-center">
-                <h2>📌 Prochains <b>événements</b></h2>
-                <p>Ne manquez pas nos rendez-vous incontournables.</p>
+
+<!-- COUNTER -->
+<section class="count_area counter_feature">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-3 col-sm-6">
+                <h2>{{ evenements|length }}+</h2>
+                <p>Événements</p>
             </div>
 
-            <div class="row g-4">
-                {% for evenement in evenements %}
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="single_course" style="background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; height: 100%; border: 1px solid #eee;">
-                            <div class="course_img" style="position: relative;">
-                                {% if evenement.imageName %}
-                                    <img src="/uploads/evenements/{{ evenement.imageName }}" class="img-fluid" alt="{{ evenement.titre }}" style="width: 100%; height: 200px; object-fit: cover;">
-                                {% else %}
-                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px; font-size: 3rem; background-color: #f8f9fa;">
-                                        📅
-                                    </div>
-                                {% endif %}
-                                <div class="course_price" style="position: absolute; top: 15px; right: 15px; background: #525fe1; color: #fff; padding: 5px 15px; border-radius: 50px; font-weight: 600;">
-                                    {% if evenement.prix %}
-                                        {{ evenement.prix }} €
-                                    {% else %}
-                                        Gratuit
-                                    {% endif %}
-                                </div>
+            <div class="col-lg-3 col-sm-6">
+                <h2>10+</h2>
+                <p>Lieux</p>
+            </div>
+
+            <div class="col-lg-3 col-sm-6">
+                <h2>100%</h2>
+                <p>Passion</p>
+            </div>
+
+            <div class="col-lg-3 col-sm-6">
+                <h2>Active</h2>
+                <p>Communauté</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- EVENTS -->
+<section class="section-padding">
+    <div class="container">
+
+        <div class="section-title text-center">
+            <h2>📌 Prochains événements</h2>
+        </div>
+
+        <div class="row g-4">
+
+            {% for evenement in evenements %}
+            
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="single_course">
+
+                        <!-- IMAGE -->
+                        {% if evenement.imageName %}
+                            <img src="/uploads/evenements/{{ evenement.imageName }}" style="width:100%; height:200px; object-fit:cover;">
+                        {% else %}
+                            <div style="height:200px; display:flex; align-items:center; justify-content:center;">
+                                📅
                             </div>
-                            
-                            <div class="course_content" style="padding: 25px;">
-                                <div class="mb-2">
-                                    {# Catégories badges #}
-                                    {% if evenement.categorie == 'conference' %}
-                                        <span class="badge bg-info">🎤 Conférence</span>
-                                    {% elseif evenement.categorie == 'atelier' %}
-                                        <span class="badge bg-warning text-dark">🔧 Atelier</span>
-                                    {% elseif evenement.categorie == 'meetup' %}
-                                        <span class="badge bg-primary">👥 Meetup</span>
-                                    {% elseif evenement.categorie == 'formation' %}
-                                        <span class="badge bg-success">📚 Formation</span>
-                                    {% elseif evenement.categorie == 'concert' %}
-                                        <span class="badge bg-danger">🎵 Concert</span>
-                                    {% endif %}
-                                </div>
+                        {% endif %}
 
-                                <h3 style="font-size: 22px; margin-bottom: 15px;"><a href="{{ path('app_evenement_detail', {id: evenement.id}) }}">{{ evenement.titre }}</a></h3>
-                                
-                                <p class="text-muted small mb-3">
-                                    <i class="ti-calendar" style="color: #525fe1; margin-right: 5px;"></i> {{ evenement.dateDebut|date('d/m/Y H:i') }}<br>
-                                    <i class="ti-location-pin" style="color: #525fe1; margin-right: 5px;"></i> {{ evenement.lieu.nom }}, {{ evenement.lieu.ville }}
-                                </p>
+                        <!-- CONTENT -->
+                        <div style="padding:20px;">
 
-                                {# Jauge de remplissage #}
-                                {% set places_occupees = evenement.inscriptions|length %}
-                                {# Sécurité pour éviter division par zéro si capacitéMax est mal saisie #}
-                                {% set capacite = evenement.capaciteMax > 0 ? evenement.capaciteMax : 1 %}
-                                {% set pourcentage = (places_occupees / capacite * 100)|round %}
-                                
-                                <div class="mb-4">
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <small>Remplissage</small>
-                                        <small>{{ pourcentage }}%</small>
-                                    </div>
-                                    <div class="progress" style="height: 6px; border-radius: 10px;">
-                                        <div class="progress-bar" role="progressbar" style="width: {{ pourcentage }}%; background: #525fe1;" aria-valuenow="{{ pourcentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
+                            <h4>
+                                <a href="{{ path('app_evenement_detail', {id: evenement.id}) }}">
+                                    {{ evenement.titre }}
+                                </a>
+                            </h4>
 
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <a href="{{ path('app_evenement_detail', {id: evenement.id}) }}" class="btn_one" style="padding: 8px 20px; font-size: 14px;">Détails</a>
-                                    <span class="text-muted small">
-                                        {# Affichage de l'organisateur pour la transparence #}
-                                       Par : <strong>{{ evenement.organisateur.pseudo ?? 'Organisateur inconnu' }}</strong>
-                                    </span>
-                                </div>
-                            </div>
+                            <p>
+                                📅  ({{ evenement.dateDebut|time_ago }}) <br>
+                                📍 {{ evenement.lieu.nom }} - {{ evenement.lieu.ville }}
+                            </p>
+                            <!-- PRICE -->
+                            <p>{{ evenement.prix|price_format }}</p>
+                            {{ capacity_badge(evenement.inscriptions|length, evenement.capaciteMax) }}
+
+                           
+
                         </div>
+
                     </div>
-                {% else %}
-                    <div class="col-12 text-center py-5">
-                        <p class="lead text-muted">Aucun événement à venir pour le moment.</p>
-                    </div>
-                {% endfor %}
-            </div>
+
+                </div>
+            {% else %}
+                <p class="text-center">Aucun événement</p>
+            {% endfor %}
+
         </div>
-    </section>
+
+    </div>
+</section>
+
 {% endblock %}
