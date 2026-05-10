@@ -58,29 +58,35 @@ class EvenementRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-    public function findByFilters(?string $titre, ?string $categorie, ?string $ville)
-{
-    $qb = $this->createQueryBuilder('e')
-        ->leftJoin('e.lieu', 'l')
-        ->addSelect('l');
+    public function findByFilters(?string $titre, ?string $categorie, ?string $ville, ?\App\Entity\TagEvenement $tag)
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->leftJoin('e.lieu', 'l')
+            ->addSelect('l');
 
-    if ($titre) {
-        $qb->andWhere('e.titre LIKE :titre')
-           ->setParameter('titre', '%'.$titre.'%');
+        if ($titre) {
+            $qb->andWhere('e.titre LIKE :titre')
+               ->setParameter('titre', '%'.$titre.'%');
+        }
+
+        if ($categorie) {
+            $qb->andWhere('e.categorie = :cat')
+               ->setParameter('cat', $categorie);
+        }
+
+        if ($ville) {
+            $qb->andWhere('l.ville LIKE :ville')
+               ->setParameter('ville', '%'.$ville.'%');
+        }
+
+        if ($tag) {
+            $qb->innerJoin('e.tags', 't')
+               ->andWhere('t = :tag')
+               ->setParameter('tag', $tag);
+        }
+
+        return $qb->orderBy('e.dateDebut', 'ASC')
+                  ->getQuery();
     }
-
-    if ($categorie) {
-        $qb->andWhere('e.categorie = :cat')
-           ->setParameter('cat', $categorie);
-    }
-
-    if ($ville) {
-        $qb->andWhere('l.ville LIKE :ville')
-           ->setParameter('ville', '%'.$ville.'%');
-    }
-
-    return $qb->orderBy('e.dateDebut', 'ASC')
-              ->getQuery(); // ✅ IMPORTANT: Query PAS result
-}
 
 }

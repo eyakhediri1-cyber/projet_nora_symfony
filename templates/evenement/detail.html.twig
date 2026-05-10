@@ -15,7 +15,7 @@
                     <div class="d-flex gap-2">
                         <a href="{{ path('app_evenement_modifier', {id: evenement.id}) }}" class="btn btn-warning btn-sm">✏️ Modifier</a>
                         
-                        <form method="post" action="{{ path('app_evenement_supprimer', {id: evenement.id}) }}" onsubmit="return confirm('Supprimer définitivement cet événement ?');">
+                        <form method="post" action="{{ path('app_evenement_supprimer', {id: evenement.id}) }}" data-confirm="Supprimer définitivement cet événement ?">
                             <input type="hidden" name="_token" value="{{ csrf_token('supprimer_' ~ evenement.id) }}">
                             <button class="btn btn-outline-danger btn-sm">🗑️ Supprimer</button>
                         </form>
@@ -82,6 +82,49 @@
                             </div>
                         </div>
                     {% endif %}
+
+                    {# Liste des participants (paginée) #}
+                    <div class="mt-5 pt-5 border-top">
+                        <h3 class="h4 mb-4">👥 Participants ({{ inscriptions.getTotalItemCount }})</h3>
+                        
+                        {% if inscriptions is empty %}
+                            <p class="text-muted italic">Aucun participant inscrit pour le moment.</p>
+                        {% else %}
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Participant</th>
+                                            <th>Date</th>
+                                            <th>Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for insc in inscriptions %}
+                                            <tr>
+                                                <td><strong>{{ insc.participant.pseudo }}</strong></td>
+                                                <td><small>{{ insc.dateInscription|date('d/m/Y') }}</small></td>
+                                                <td>
+                                                    {% if insc.statut == 'confirmee' %}
+                                                        <span class="badge bg-success">Confirmée</span>
+                                                    {% elseif insc.statut == 'en_attente' %}
+                                                        <span class="badge bg-warning text-dark">En attente</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">Annulée</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {# Pagination des inscriptions #}
+                            <div class="d-flex justify-content-center mt-3">
+                                {{ knp_pagination_render(inscriptions) }}
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
                 <p>{{ nbInscrits }} / {{ evenement.capaciteMax }} places</p>
 

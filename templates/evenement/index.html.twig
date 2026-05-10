@@ -83,8 +83,19 @@
                value="{{ app.request.get('ville') }}">
     </div>
 
-    <div class="col-md-2">
-        <button class="btn btn-primary w-100">
+    <div class="col-md-3">
+        <select name="tag" class="form-select">
+            <option value="">🏷️ Tous les tags</option>
+            {% for tag in tags %}
+                <option value="{{ tag.id }}" {{ app.request.get('tag') == tag.id ? 'selected' : '' }}>
+                    {{ tag.nom }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-12 text-end">
+        <button class="btn btn-primary">
             Rechercher
         </button>
     </div>
@@ -100,11 +111,12 @@
 
                     <thead>
                     <tr style="border-bottom: 2px solid #525fe1;">
-                        <th>📝 Titre</th>
+                        <th>{{ knp_pagination_sortable(evenements, '📝 Titre', 'e.titre') }}</th>
                         <th>🎯 Catégorie</th>
-                        <th>📅 Date</th>
+                        <th>{{ knp_pagination_sortable(evenements, '📅 Date', 'e.dateDebut') }}</th>
                         <th>📍 Lieu</th>
                         <th>👥 Places</th>
+                        <th>{{ knp_pagination_sortable(evenements, '💰 Prix', 'e.prix') }}</th>
                         <th>📊 Statut</th>
                         <th class="text-center">⚙️ Actions</th>
                     </tr>
@@ -251,7 +263,7 @@
                                         <form method="post"
                                               action="{{ path('app_evenement_supprimer', {id: evenement.id}) }}"
                                               class="d-inline"
-                                              onsubmit="return confirm('Êtes-vous sûr ?');">
+                                              data-confirm="Voulez-vous vraiment supprimer cet événement ?">
 
                                             <input type="hidden"
                                                    name="_token"

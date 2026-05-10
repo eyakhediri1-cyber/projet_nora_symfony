@@ -39,7 +39,8 @@ class Inscription
 
     public function __construct()
     {
-        $this->dateInscription = new \DateTime(); // auto
+        $this->dateInscription = new \DateTime();
+        $this->statut = 'en_attente';
     }
 
     public function getId(): ?int { return $this->id; }

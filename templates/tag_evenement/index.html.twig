@@ -38,7 +38,7 @@
                                 </div>
                                 <div class="mt-auto">
                                     <form method="post" action="{{ path('app_tag_supprimer', {id: tag.id}) }}"
-                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce tag ?');"
+                                          data-confirm="Êtes-vous sûr de vouloir supprimer ce tag ?"
                                           class="d-inline">
                                         <input type="hidden" name="_token" value="{{ csrf_token('supprimer_tag_' ~ tag.id) }}">
                                         <button type="submit" class="btn btn-sm btn-outline-danger w-100" style="border-radius: 50px;">

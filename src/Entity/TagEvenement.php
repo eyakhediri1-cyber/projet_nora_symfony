@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TagEvenementRepository::class)]
 #[UniqueEntity(fields: ['nom'], message: 'Ce tag existe déjà.')]
@@ -20,6 +21,7 @@ class TagEvenement
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank]
+    #[Groups(['event:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 7)]

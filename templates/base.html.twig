@@ -19,6 +19,7 @@
         <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 
         {% block stylesheets %}{% endblock %}
+        {{ importmap('app') }}
 
         {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
         {% if frankenphpHotReload %}

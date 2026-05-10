@@ -9,6 +9,8 @@ use App\Entity\Inscription;
 use App\Form\EvenementType;
 use App\Form\InscriptionType;
 use App\Repository\EvenementRepository;
+use App\Repository\TagEvenementRepository;
+use App\Repository\InscriptionRepository;
 use App\Service\EvenementManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,25 +46,31 @@ class EvenementController extends AbstractController
     public function index(
         Request $request,
         EvenementRepository $repo,
+        TagEvenementRepository $tagRepo,
         PaginatorInterface $paginator
     ): Response
     {
+        $tagId = $request->query->get('tag');
+        $tag = $tagId ? $tagRepo->find($tagId) : null;
+
         $query = $repo->findByFilters(
-        $request->query->get('titre'),
-        $request->query->get('categorie'),
-        $request->query->get('ville')
-    );
+            $request->query->get('titre'),
+            $request->query->get('categorie'),
+            $request->query->get('ville'),
+            $tag
+        );
 
-    $evenements = $paginator->paginate(
-        $query,
-        $request->query->getInt('page', 1),
-        9
-    );
+        $evenements = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            9
+        );
 
-    return $this->render('evenement/index.html.twig', [
-        'evenements' => $evenements,
-    ]);
-}
+        return $this->render('evenement/index.html.twig', [
+            'evenements' => $evenements,
+            'tags' => $tagRepo->findAll(),
+        ]);
+    }
 
 
 #[Route('/evenements/nouveau', name: 'app_evenement_nouveau')]
@@ -92,7 +100,13 @@ public function nouveau(Request $request, EntityManagerInterface $em, FileUpload
 
 
     #[Route('/evenements/{id}', name: 'app_evenement_detail', requirements: ['id' => '\d+'])]
-    public function detail(Evenement $evenement, RequestStack $rs): Response
+    public function detail(
+        Evenement $evenement,
+        Request $request,
+        RequestStack $rs,
+        InscriptionRepository $inscRepo,
+        PaginatorInterface $paginator
+    ): Response
     {
         // Session — derniers consultés
         $session = $rs->getSession();
@@ -103,8 +117,20 @@ public function nouveau(Request $request, EntityManagerInterface $em, FileUpload
         array_unshift($recents, $evenement->getId());
         $session->set('recents', array_slice($recents, 0, 5));
 
+        // Pagination des inscriptions (10 par page)
+        $inscriptions = $paginator->paginate(
+            $inscRepo->createQueryBuilder('i')
+                ->where('i.evenement = :e')
+                ->setParameter('e', $evenement)
+                ->orderBy('i.dateInscription', 'DESC')
+                ->getQuery(),
+            $request->query->getInt('page', 1),
+            10
+        );
+
         return $this->render('evenement/detail.html.twig', [
             'evenement'       => $evenement,
+            'inscriptions'    => $inscriptions,
             'placesRestantes' => $this->eventManager->getPlacesRestantes($evenement),
             'nbInscrits'      => $this->eventManager->getNbInscrits($evenement),
             'estInscrit'      => $this->getUser()

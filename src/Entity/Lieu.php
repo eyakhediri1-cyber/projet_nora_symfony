@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: LieuRepository::class)]
 #[UniqueEntity(fields: ['nom'], message: 'Ce nom de lieu existe déjà.')]
@@ -22,6 +23,7 @@ class Lieu
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank]
+    #[Groups(['event:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
@@ -30,6 +32,7 @@ class Lieu
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank]
+    #[Groups(['event:read'])]
     private ?string $ville = null;
 
     #[ORM\Column]
