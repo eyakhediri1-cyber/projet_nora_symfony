@@ -15,9 +15,15 @@ class EvenementManager
     ) {}
 
     public function getNbInscrits(Evenement $e): int
-    {
-        return count($e->getInscriptions());
+{
+    $count = 0;
+    foreach ($e->getInscriptions() as $inscription) {
+        if ($inscription->getStatut() === 'confirmee') {
+            $count++;
+        }
     }
+    return $count;
+}
 
     public function getPlacesRestantes(Evenement $e): int
     {

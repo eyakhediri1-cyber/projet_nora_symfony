@@ -85,7 +85,7 @@
                 </div>
                 <p>{{ nbInscrits }} / {{ evenement.capaciteMax }} places</p>
 
-<p>Places restantes : {{ placesRestantes }}</p>
+                <p>Places restantes : {{ placesRestantes }}</p>
 
                 {# Sidebar - Jauge et inscription #}
                 <div class="col-lg-4">
@@ -101,6 +101,7 @@
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">Places occupées</span>
                                     <strong style="color: #525fe1;">{{ places_occupees }} / {{ evenement.capaciteMax }}</strong>
+                                    {{ capacity_badge(places_occupees, evenement.capaciteMax) }}
                                 </div>
                                 <div class="progress" style="height: 10px; border-radius: 10px;">
                                     <div class="progress-bar" role="progressbar" style="width: {{ pourcentage }}%; background: #525fe1;" aria-valuenow="{{ pourcentage }}" aria-valuemin="0" aria-valuemax="100"></div>
@@ -114,8 +115,11 @@
                                 <p class="mb-3 d-flex align-items-center">
                                     <i class="ti-calendar me-3" style="color: #525fe1; font-size: 1.2rem;"></i>
                                     <span>
+
+                                    {# DATEEEEEEEEEEEEEEEEEEEEEEEEE #}
                                         <strong>Date :</strong><br>
                                         {{ evenement.dateDebut|date('d/m/Y H:i') }}
+                                        <br><small class="text-muted">{{ evenement.dateDebut|time_ago }}</small>
                                     </span>
                                 </p>
                                 <p class="mb-3 d-flex align-items-center">
@@ -127,14 +131,12 @@
                                 </p>
                                 <p class="mb-0 d-flex align-items-center">
                                     <i class="ti-wallet me-3" style="color: #525fe1; font-size: 1.2rem;"></i>
-                                    <span>
-                                        <strong>Tarif :</strong><br>
-                                        {% if evenement.prix %}
-                                            <span style="font-size: 1.5rem; font-weight: 700; color: #0b104a;">{{ evenement.prix }} €</span>
-                                        {% else %}
-                                            <span class="badge bg-success">Gratuit</span>
-                                        {% endif %}
+
+                                    {# PRIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX #}
+                                    <span style="font-size: 1.5rem; font-weight: 700; color: #0b104a;">
+                                        {{ evenement.prix|price_format }}
                                     </span>
+
                                 </p>
                             </div>
 

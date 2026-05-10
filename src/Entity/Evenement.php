@@ -66,7 +66,7 @@ class Evenement
 
     #[ORM\Column(length: 20)]
     #[Assert\Choice(choices: self::STATUTS)]
-    #[Groups(['event:read'])]
+    #[Groups(['event:read', 'event:write'])]
     private ?string $statut = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -80,7 +80,7 @@ class Evenement
     #[ORM\ManyToOne(inversedBy: 'evenements')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank]
-    #[Groups(['event:read'])]
+    #[Groups(['event:read', 'event:write'])]
     private ?Lieu $lieu = null;
 
     #[ORM\ManyToOne(inversedBy: 'evenementsOrganises')]

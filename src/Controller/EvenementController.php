@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller;
 
+use Knp\Component\Pager\PaginatorInterface;
 
 use App\Service\FileUploader;
 use App\Entity\Evenement;
@@ -37,20 +38,34 @@ class EvenementController extends AbstractController
         ]);
     }
 
-    #[Route('/evenements', name: 'app_evenements')]
-    public function index(Request $request, EvenementRepository $repo): Response
-    {
-        $evenements = $repo->findByFilters(
-            $request->query->get('titre'),
-            $request->query->get('categorie'),
-            $request->query->get('ville'),
-        );
-        return $this->render('evenement/index.html.twig', [
-            'evenements' => $evenements,
-        ]);
-    }
 
-    #[Route('/evenements/nouveau', name: 'app_evenement_nouveau')]
+    // pagination
+    #[Route('/evenements', name: 'app_evenements')]
+    public function index(
+        Request $request,
+        EvenementRepository $repo,
+        PaginatorInterface $paginator
+    ): Response
+    {
+        $query = $repo->findByFilters(
+        $request->query->get('titre'),
+        $request->query->get('categorie'),
+        $request->query->get('ville')
+    );
+
+    $evenements = $paginator->paginate(
+        $query,
+        $request->query->getInt('page', 1),
+        9
+    );
+
+    return $this->render('evenement/index.html.twig', [
+        'evenements' => $evenements,
+    ]);
+}
+
+
+#[Route('/evenements/nouveau', name: 'app_evenement_nouveau')]
 #[IsGranted('ROLE_ORGANISATEUR')]
 public function nouveau(Request $request, EntityManagerInterface $em, FileUploader $uploader): Response
 {
