@@ -66,27 +66,27 @@ class EvenementRepository extends ServiceEntityRepository
 
         if ($titre) {
             $qb->andWhere('e.titre LIKE :titre')
-               ->setParameter('titre', '%'.$titre.'%');
+                ->setParameter('titre', '%' . $titre . '%');
         }
 
         if ($categorie) {
             $qb->andWhere('e.categorie = :cat')
-               ->setParameter('cat', $categorie);
+                ->setParameter('cat', $categorie);
         }
 
         if ($ville) {
             $qb->andWhere('l.ville LIKE :ville')
-               ->setParameter('ville', '%'.$ville.'%');
+                ->setParameter('ville', '%' . $ville . '%');
         }
 
         if ($tag) {
             $qb->innerJoin('e.tags', 't')
-               ->andWhere('t = :tag')
-               ->setParameter('tag', $tag);
+                ->andWhere('t = :tag')
+                ->setParameter('tag', $tag);
         }
 
         return $qb->orderBy('e.dateDebut', 'ASC')
-                  ->getQuery();
+            ->getQuery();
     }
 
 }

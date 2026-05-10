@@ -216,6 +216,10 @@
                             </td>
 
                             <td>
+                                <strong>{{ evenement.prix|price_format }}</strong>
+                            </td>
+
+                            <td>
 
                                 {% if evenement.statut == 'publie' %}
                                     <span class="badge bg-success">🟢 Publié</span>
