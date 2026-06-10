@@ -11,10 +11,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+//win nektbou les requêtes sql
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
 #[ApiResource(
+    //Quand quelqu'un demande des événements→ montre seulement les champs marqués event:read
     normalizationContext: ['groups' => ['event:read']],
+
     denormalizationContext: ['groups' => ['event:write']]
+    //Quand quelqu'un envoie des données→ accepte seulement les champs marqués event:write
 )]
 class Evenement
 {
@@ -142,6 +146,9 @@ class Evenement
 
     public function getTags(): Collection { return $this->tags; }
 
+
+
+    //Vérifie que le tag n'est pas déjà dans la liste avant de l'ajouter et Évite les doublons
     public function addTag(TagEvenement $tag): static
     {
         if (!$this->tags->contains($tag)) {

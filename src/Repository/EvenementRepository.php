@@ -17,16 +17,12 @@ class EvenementRepository extends ServiceEntityRepository
     }
 
     /**
-     * Retourne les 6 prochains événements publiés
+     * Retourne les 6 prochains événements (tous statuts confondus)
      * @return Evenement[]
      */
     public function findUpcoming(int $limit = 6): array
     {
         return $this->createQueryBuilder('e')
-            ->andWhere('e.statut = :statut')
-            ->andWhere('e.dateDebut >= :now')
-            ->setParameter('statut', 'publie')
-            ->setParameter('now', new \DateTime())
             ->orderBy('e.dateDebut', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()
